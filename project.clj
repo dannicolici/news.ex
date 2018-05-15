@@ -2,11 +2,19 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [compojure "1.5.1"]
-                 [ring/ring-defaults "0.2.1"]]
-  :plugins [[lein-ring "0.9.7"]]
+  :cljsbuild {:builds [{:source-paths ["src/cljs"]
+                        :compiler     {:optimizations :whitespace
+                                       :output-to     "resources/public/js/main.js"
+                                       :output-dir    "resources/public/js"}}]}
+  :dependencies [[org.clojure/clojure "1.9.0"]
+                 [org.clojure/clojurescript "1.10.238"]
+                 [compojure "1.6.0"]
+                 [ring/ring-defaults "0.3.1"]
+                 [cljs-ajax "0.7.3"]]
+
+  :plugins [[lein-ring "0.12.4"]
+            [lein-cljsbuild "1.1.7"]]
   :ring {:handler block.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.0"]]}})
+                        [ring/ring-mock "0.3.2"]]}})
