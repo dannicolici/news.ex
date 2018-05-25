@@ -6,7 +6,7 @@
 
 (defroutes app-routes
            (context "/api" []
-             (GET "/news/:user" [user] (news/feed user))))
+             (GET "/news/:user-id" [user-id] (news/feed user-id))))
 
 (defroutes static-routes
            (route/resources "/public"))
