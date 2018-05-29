@@ -1,4 +1,5 @@
-(ns news.core)
+(ns news.core
+  (:require [persistence.core :as p :refer :all]))
 
-(defn feed [user]
-  (str "this is a stub feed for " user))
+(defn news-for-user [user-id]
+  (p/get-news-by-user-id user-id))

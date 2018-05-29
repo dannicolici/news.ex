@@ -1,11 +1,16 @@
-(ns cljs.news.core
-  (:require [ajax.core :refer [GET POST]]))
-
-
-(defn handler [response]
-      (.log js/console (str response)))
+(ns news.core
+  (:require [ajax.core :refer [GET POST]]
+            [reagent.core :as r]))
 
 (defn error-handler [{:keys [status status-text]}]
-      (.log js/console (str "something bad happened: " status " " status-text)))
+  (.log js/console (str "something went wrong: " status " " status-text)))
 
-(GET "/api/news/danutzulica")
+(def feed (r/atom nil))
+
+(defn news-app []
+  (GET "/api/news/1" {:handler (fn [r] (reset! feed r))})
+  [:div "and now " (str "za news >" @feed "<")])
+
+(defn ^:export start []
+  (r/render-component [news-app]
+                      (.getElementById js/document "root")))

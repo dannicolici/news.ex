@@ -2,11 +2,16 @@
   (:require [news.core :as news :refer :all]
             [compojure.core :refer :all]
             [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
+            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            [ring.util.response :as r :refer :all]))
 
 (defroutes app-routes
            (context "/api" []
-             (GET "/news/:user-id" [user-id] (news/feed user-id))))
+             (GET "/news/:user-id" [user-id]
+               (r/content-type
+                 (r/response
+                   (clojure.string/join ", " (news/news-for-user user-id)))
+                 "text/plain"))))
 
 (defroutes static-routes
            (route/resources "/public"))

@@ -29,10 +29,10 @@
 (defn get-news-by-user-id [user-id] (get-by-id* user-id usr-news-key))
 
 (defn -main [& args]
-  (println (save-user (user 1 "firstuser" "fname" "lname")))
-  (println (get-user-by-id 1))
-  (println (save-news (news 1 1 "some text")))
-  (println (get-news-by-id 1))
+  ;(println (save-user (user 1 "firstuser" "fname" "lname")))
+  ;(println (get-user-by-id 1))
+  ;(println (save-news (news 1 1 "some text")))
+  ;(println (get-news-by-id 1))
   (println (get-news-by-user-id 1)))
 ;(println (macroexpand-1 `(save-by-id* {:id 1} usr-key))))
 ;  (println (wcar* (car/scan 0))))

@@ -12,7 +12,8 @@
                  [compojure "1.6.0"]
                  [ring/ring-defaults "0.3.1"]
                  [cljs-ajax "0.7.3"]
-                 [com.taoensso/carmine "2.18.1"]]
+                 [com.taoensso/carmine "2.18.1"]
+                 [reagent "0.8.1"]]
 
   :plugins [[lein-ring "0.12.4"]
             [lein-cljsbuild "1.1.7"]]
