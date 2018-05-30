@@ -3,15 +3,15 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [ring.util.response :as r :refer :all]))
+            [ring.util.response :as r :refer :all]
+            [ring.middleware.json :refer [wrap-json-response]]))
 
 (defroutes app-routes
            (context "/api" []
              (GET "/news/:user-id" [user-id]
-               (r/content-type
-                 (r/response
-                   (clojure.string/join ", " (news/news-for-user user-id)))
-                 "text/plain"))))
+               (r/response
+                 (map #(select-keys % [:id :text])
+                      (news/news-for-user user-id))))))
 
 (defroutes static-routes
            (route/resources "/public"))
@@ -28,4 +28,5 @@
              static-routes
              (wrap-defaults app-routes site-defaults)
              (route/not-found "Not Found"))
-           wrap-root))
+           wrap-root
+           wrap-json-response))

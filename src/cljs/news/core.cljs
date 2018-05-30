@@ -9,7 +9,7 @@
 
 (defn news-app []
   (GET "/api/news/1" {:handler (fn [r] (reset! feed r))})
-  [:div "and now " (str "za news >" @feed "<")])
+  [:div @feed])
 
 (defn ^:export start []
   (r/render-component [news-app]

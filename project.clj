@@ -11,6 +11,7 @@
                  [org.clojure/clojurescript "1.10.238"]
                  [compojure "1.6.0"]
                  [ring/ring-defaults "0.3.1"]
+                 [ring/ring-json "0.4.0"]
                  [cljs-ajax "0.7.3"]
                  [com.taoensso/carmine "2.18.1"]
                  [reagent "0.8.1"]]
