@@ -16,10 +16,14 @@
        {:handler (fn [r] (reset! feed r))
         :error-handler error-handler}))
 
+(defn feed-map [] (t/read json @feed))
+
 (defn news-app []
   (get-news @user)
   (fn [] [:div
-          (map #(get % "text") (t/read json @feed))]))
+          [:ul {:id "news"}
+           (for [news (feed-map)] ^{:key (get news "id")} [:li (get news "text")])]]))
+
 
 (defn ^:export start []
   (r/render-component [news-app]

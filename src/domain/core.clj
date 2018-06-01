@@ -1,16 +1,16 @@
 (ns domain.core)
 
 (defrecord User
-  [^Integer id
-   ^String username
-   ^String first-name
-   ^String last-name])
-(defn user [id username first-name last-name]
-  (->User id username first-name last-name))
+   [^String id
+    ^String first-name
+    ^String last-name
+    ^String password])
+(defn user [id first-name last-name password]
+  (->User id first-name last-name password))
 
 (defrecord News
   [^Integer id
-   ^Integer user-id
+   ^String user-id
    ^String text])
 (defn news [id user-id text]
   (->News id user-id text))
