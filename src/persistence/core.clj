@@ -11,6 +11,16 @@
 (defn news-key [id] (str "nws:" id))
 (defn usr-news-key [usr-id] (str "u-n:" usr-id))
 
+(defn init-id-seq []
+  (wcar* (car/set "id-seq" 0)))
+
+(defn new-id []
+  (let [[_ id]
+        (wcar* (car/incr "id-seq")
+               (car/get "id-seq"))]
+    id))
+
+
 (defmacro save-by-id* [x key-fn]
   `(wcar* (car/set (~key-fn (:id ~x)) ~x)))
 (defmacro get-by-id* [id key-fn]
@@ -30,9 +40,13 @@
   (map get-news-by-id (get-by-id* user-id usr-news-key)))
 
 (defn -main [& args]
-  (println (save-user (user 1 "firstuser" "fname" "lname")))
-  (println (get-user-by-id 1))
-  (println (save-news (news 1 1 "some text")))
-  (println (get-news-by-id 1))
-  (println (map #(select-keys % [:id :text]) (get-news-by-user-id 1))))
+  ;(println (save-user (user 1 "firstuser" "fname" "lname")))
+  ;(println (get-user-by-id 1))
+  ;(println (save-news (news 1 1 "some text")))
+  ;(println (save-news (news 2 1 "news two")))
+  ;(println (get-news-by-id 1))
+  ;(println (get-news-by-id 2))
+  ;(println (map #(select-keys % [:id :text]) (get-news-by-user-id 1))))
+  (init-id-seq)
+  (println (str "id: " (new-id))))
 
