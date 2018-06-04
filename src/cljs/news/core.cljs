@@ -3,26 +3,28 @@
             [reagent.core :as r]
             [cognitect.transit :as t]))
 
+(defn console [& args]
+  (.log js/console (str args)))
+
 (defn error-handler [{:keys [status status-text]}]
-  (.log js/console (str "something went wrong: " status " " status-text)))
+  (console "something went wrong: " status " " status-text))
 
-(def json (t/reader :json))
-
+(def as-json (t/reader :json))
 (def feed (r/atom nil))
-(def user (r/atom 1))
+(defn feed-map [] (t/read as-json @feed))
 
-(defn get-news [user-id]
-  (GET (str "/api/news/" user-id)
-       {:handler (fn [r] (reset! feed r))
-        :error-handler error-handler}))
-
-(defn feed-map [] (t/read json @feed))
+(defn get-all-news []
+  (GET "/api/news"
+    {:handler       (fn [r] (reset! feed r))
+     :error-handler error-handler}))
 
 (defn news-app []
-  (get-news @user)
+  (get-all-news)
   (fn [] [:div
           [:ul {:id "news"}
-           (for [news (feed-map)] ^{:key (get news "id")} [:li (get news "text")])]]))
+           (for [news (feed-map)]
+             ^{:key (get news "id")}
+             [:li (get news "text") " - " (get news "user-id")])]]))
 
 
 (defn ^:export start []

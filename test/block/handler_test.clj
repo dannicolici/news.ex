@@ -27,6 +27,11 @@
     (is (= (:status response) 201))
     (is (= (:body response) "created"))))
 
+(defn create-and-assert-news [user-id news]
+  (let [response (app (-> (mock/request :post (str "/api/news/" user-id) news)))]
+    (is (= (:status response) 201))
+    (is (= (:body response) "created"))))
+
 (deftest test-user
   (testing "put user"
     (create-and-assert-user "nickname"))
@@ -49,9 +54,12 @@
       (is (= (:status response) 409))))
   (testing "post news for existing user"
     (create-and-assert-user "zzz")
-    (let [response (app (-> (mock/request :post "/api/news/zzz" {"text" "some news text"})))]
-      (is (= (:status response) 201))
-      (is (= (:body response) "created")))
+    (create-and-assert-news "zzz" {"text" "some news text"})
     (let [response (app (mock/request :get "/api/news/zzz"))]
       (is (= (:status response) 200))
-      (is (= (:body response) "[{\"id\":\"1\",\"text\":\"some news text\"}]")))))
+      (is (= (:body response) "[{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"}]")))
+    (create-and-assert-news "zzz" {"text" "news2"})
+    (let [response (app (mock/request :get "/api/news/zzz"))]
+      (is (= (:status response) 200))
+      (is (= (:body response) (str "[{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"},"
+                                   "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\"}]"))))))

@@ -22,8 +22,11 @@
 
              (GET "/news/:user-id" [user-id]
                (r/response
-                 (map #(select-keys % [:id :text])
-                      (news/news-for-user user-id))))))
+                 (news/news-for-user user-id)))
+
+             (GET "/news" []
+               (r/response
+                 (news/all-news)))))
 
 
 (defroutes static-routes
