@@ -1,4 +1,5 @@
-(ns domain.core)
+(ns domain.core
+  (:require [java-time :as t]))
 
 (defrecord User
    [^String id
@@ -11,6 +12,7 @@
 (defrecord News
   [^Integer id
    ^String user-id
-   ^String text])
+   ^String text
+   ^String date-time])
 (defn news [id user-id text]
-  (->News id user-id text))
+  (->News id user-id text (.toString (t/local-date-time))))

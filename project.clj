@@ -15,7 +15,8 @@
                  [cljs-ajax "0.7.3"]
                  [com.taoensso/carmine "2.18.1"]
                  [reagent "0.8.1"]
-                 [com.cognitect/transit-cljs "0.8.256"]]
+                 [com.cognitect/transit-cljs "0.8.256"]
+                 [clojure.java-time "0.3.2"]]
 
   :plugins [[lein-ring "0.12.4"]
             [lein-cljsbuild "1.1.7"]]

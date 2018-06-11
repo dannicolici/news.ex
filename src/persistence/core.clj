@@ -17,10 +17,10 @@
 (defn news-key [id] (str "nws:" id))
 (defn usr-news-key [usr-id] (str "u-n:" usr-id))
 
-(defn init-id-seq []
+(defn init-id-seq! []
   (wcar* (car/set id-seq 0)))
 
-(defn new-id []
+(defn new-id! []
   (let [[_ id]
         (wcar* (car/incr id-seq)
                (car/get id-seq))]
@@ -38,7 +38,7 @@
       (ctor entity)
       nil)))
 
-(defn save-user [u] (save-by-id* u usr-key))
+(defn save-user! [u] (save-by-id* u usr-key))
 
 (defn get-user-by-id [id] (get-entity-by-id id usr-key map->User))
 
@@ -47,7 +47,7 @@
     #(get-entity-by-id (clojure.string/replace % usr-pref "") usr-key map->User)
     (wcar* (car/keys (str usr-pref "*")))))
 
-(defn save-news [n]
+(defn save-news! [n]
   "saves the news object and creates relation to user in a sorted set
     user needs to exist, otherwise news is not saved"
   (if-not (get-user-by-id (:user-id n))
@@ -56,7 +56,7 @@
       (wcar*
         (let [u-n-id (usr-news-key (:user-id n))
               news-id-list (wcar* (car/get u-n-id))
-              news (assoc n :id (new-id))]
+              news (assoc n :id (new-id!))]
           (save-by-id* news news-key)
           (car/set u-n-id (into (sorted-set) (conj news-id-list (:id news))))))
       1)))
@@ -69,12 +69,12 @@
 
 (defn -main [& args]
   (flush-db)
-  (println (save-user (user "firstuser" "fname" "lname" (md5 "pwd"))))
-  (println (save-user (user "seconduser" "xxxxx" "aaa" (md5 "pwd3"))))
-  (println (save-news (news nil "firstuser" "some text")))
-  (println (save-news (news nil "firstuser" "news two")))
-  (println (save-news (news nil "seconduser" "wowowiwa")))
-  (println (save-news (news nil "seconduser" "kiki koko")))
+  (println (save-user! (user "firstuser" "fname" "lname" (md5 "pwd"))))
+  (println (save-user! (user "seconduser" "xxxxx" "aaa" (md5 "pwd3"))))
+  (println (save-news! (news nil "firstuser" "some text")))
+  (println (save-news! (news nil "firstuser" "news two")))
+  (println (save-news! (news nil "seconduser" "wowowiwa")))
+  (println (save-news! (news nil "seconduser" "kiki koko")))
   (println (get-all-users)))
   ;(init-id-seq)
   ;(println (str "id: " (new-id))))

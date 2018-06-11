@@ -3,7 +3,8 @@
             [persistence.core :as p :refer :all]
             [ring.mock.request :as mock]
             [block.handler :refer :all]
-            [password.core :refer :all]))
+            [password.core :refer :all]
+            [clojure.string :as str]))
 
 (defn data-fixture [f]
   (p/flush-db)
@@ -57,9 +58,10 @@
     (create-and-assert-news "zzz" {"text" "some news text"})
     (let [response (app (mock/request :get "/api/news/zzz"))]
       (is (= (:status response) 200))
-      (is (= (:body response) "[{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"}]")))
+      (is (str/includes? (:body response) "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")))
     (create-and-assert-news "zzz" {"text" "news2"})
     (let [response (app (mock/request :get "/api/news/zzz"))]
       (is (= (:status response) 200))
-      (is (= (:body response) (str "[{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"},"
-                                   "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\"}]"))))))
+      (is (let [resp (:body response)]
+            (and (str/includes? resp "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")
+                 (str/includes? resp "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\"")))))))

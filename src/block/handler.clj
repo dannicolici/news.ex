@@ -11,12 +11,12 @@
 (defroutes app-routes
            (context "/api" []
              (PUT "/user/:id/:fname/:lname/:pwd" [id fname lname pwd]
-               (if (= 1 (p/save-user (d/user id fname lname pwd)))
+               (if (= 1 (p/save-user! (d/user id fname lname pwd)))
                  (r/status {:body "created"} 201)
                  (r/status {:body "already exists"} 409)))
 
              (POST "/news/:user-id" [user-id text]
-               (if (= 1 (p/save-news (d/news nil user-id text)))
+               (if (= 1 (p/save-news! (d/news nil user-id text)))
                  (r/status {:body "created"} 201)
                  (r/status {:body "user doesn't exist"} 409)))
 
