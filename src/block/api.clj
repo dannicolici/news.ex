@@ -1,14 +1,13 @@
-(ns block.handler
+(ns block.api
   (:require [news.core :as news :refer :all]
             [persistence.core :as p :refer :all]
             [domain.core :as d :refer :all]
             [compojure.core :refer :all]
-            [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.util.response :as r :refer :all]
             [ring.middleware.json :refer [wrap-json-response]]))
 
-(defroutes app-routes
+(defroutes api
            (context "/api" []
              (PUT "/user/:id/:fname/:lname/:pwd" [id fname lname pwd]
                (if (= 1 (p/save-user! (d/user id fname lname pwd)))
@@ -28,22 +27,8 @@
                (r/response
                  (news/all-news)))))
 
+(defroutes api-routes api)
 
-(defroutes static-routes
-           (route/resources "/public"))
+(defroutes non-secure-app (wrap-defaults api-routes
+                                         (assoc-in site-defaults [:security :anti-forgery] false)))
 
-(defn- wrap-root [handler]
-  (fn [req]
-    (handler
-      (update-in req [:uri]
-                 #(if (= "/" %) "/index.html" %)))))
-
-
-(def app (->
-           (routes
-             static-routes
-             (wrap-defaults app-routes
-                            (assoc-in site-defaults [:security :anti-forgery] false))
-             (route/not-found "Not Found"))
-           wrap-root
-           wrap-json-response))

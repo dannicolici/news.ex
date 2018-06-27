@@ -9,8 +9,3 @@
   (sort-by #(:id %)
            (mapcat #(news-for-user (:id %))
                    (p/get-all-users))))
-
-(defn --main [& args]
-  (if (= (nth (all-news) 2) (first (news-for-user "seconduser")))
-    (println "YES")
-    (println "NO")))

@@ -16,12 +16,13 @@
                  [com.taoensso/carmine "2.18.1"]
                  [reagent "0.8.1"]
                  [com.cognitect/transit-cljs "0.8.256"]
-                 [clojure.java-time "0.3.2"]]
+                 [clojure.java-time "0.3.2"]
+                 [com.cemerick/friend "0.2.3"]]
 
   :plugins [[lein-ring "0.12.4"]
             [lein-cljsbuild "1.1.7"]]
 
-  :ring {:handler block.handler/app}
+  :ring {:handler block.secure/app}
 
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

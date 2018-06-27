@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [persistence.core :as p :refer :all]
             [ring.mock.request :as mock]
-            [block.handler :refer :all]
+            [block.api :refer :all]
             [password.core :refer :all]
             [clojure.string :as str]))
 
@@ -13,23 +13,13 @@
 
 (use-fixtures :each data-fixture)
 
-(deftest test-routes
-  (testing "main route"
-    (let [response (app (mock/request :get "/"))]
-      (is (= (:status response) 200))
-      (is (clojure.string/includes? (:body response) "index.html"))))
-
-  (testing "not-found route"
-    (let [response (app (mock/request :get "/invalid"))]
-      (is (= (:status response) 404)))))
-
 (defn create-and-assert-user [id]
-  (let [response (app (mock/request :put (str "/api/user/" id "/john/doe/" (md5 "pwd"))))]
+  (let [response (non-secure-app (mock/request :put (str "/api/user/" id "/john/doe/" (md5 "pwd"))))]
     (is (= (:status response) 201))
     (is (= (:body response) "created"))))
 
 (defn create-and-assert-news [user-id news]
-  (let [response (app (-> (mock/request :post (str "/api/news/" user-id) news)))]
+  (let [response (non-secure-app (-> (mock/request :post (str "/api/news/" user-id) news)))]
     (is (= (:status response) 201))
     (is (= (:body response) "created"))))
 
@@ -45,22 +35,22 @@
       (is (= (:password user) (md5 "pwd")))))
 
   (testing "put same user"
-    (let [response (app (mock/request :put (str "/api/user/nickname/john/doe/" (md5 "pwd"))))]
+    (let [response (non-secure-app (mock/request :put (str "/api/user/nickname/john/doe/" (md5 "pwd"))))]
       (is (= (:status response) 409))
       (is (= (:body response) "already exists")))))
 
 (deftest test-news
   (testing "post news for non-existing user"
-    (let [response (app (mock/request :post "/api/news/non-existing-user" {"text" "some news text"}))]
+    (let [response (non-secure-app (mock/request :post "/api/news/non-existing-user" {"text" "some news text"}))]
       (is (= (:status response) 409))))
   (testing "post news for existing user"
     (create-and-assert-user "zzz")
     (create-and-assert-news "zzz" {"text" "some news text"})
-    (let [response (app (mock/request :get "/api/news/zzz"))]
+    (let [response (non-secure-app (mock/request :get "/api/news/zzz"))]
       (is (= (:status response) 200))
       (is (str/includes? (:body response) "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")))
     (create-and-assert-news "zzz" {"text" "news2"})
-    (let [response (app (mock/request :get "/api/news/zzz"))]
+    (let [response (non-secure-app (mock/request :get "/api/news/zzz"))]
       (is (= (:status response) 200))
       (is (let [resp (:body response)]
             (and (str/includes? resp "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")
