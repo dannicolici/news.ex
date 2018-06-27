@@ -29,6 +29,8 @@
 
 (defroutes api-routes api)
 
-(defroutes non-secure-app (wrap-defaults api-routes
-                                         (assoc-in site-defaults [:security :anti-forgery] false)))
+(defroutes non-secure-app (->
+                            (wrap-defaults api-routes
+                              (assoc-in site-defaults [:security :anti-forgery] false))
+                            wrap-json-response))
 
