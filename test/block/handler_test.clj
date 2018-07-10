@@ -14,7 +14,7 @@
 (use-fixtures :each data-fixture)
 
 (defn create-and-assert-user [id]
-  (let [response (non-secure-app (mock/request :put (str "/api/user/" id "/john/doe/" (md5 "pwd"))))]
+  (let [response (non-secure-app (mock/request :post "/api/user" {"id" id, "fname" "john", "lname" "doe", "pwd" (encrypt "pwd")}))]
     (is (= (:status response) 201))
     (is (= (:body response) "created"))))
 
@@ -32,10 +32,10 @@
       (is (= (:id user) "nickname"))
       (is (= (:first-name user) "john"))
       (is (= (:last-name user) "doe"))
-      (is (= (:password user) (md5 "pwd")))))
+      (is (matches "pwd" (:password user)))))
 
   (testing "put same user"
-    (let [response (non-secure-app (mock/request :put (str "/api/user/nickname/john/doe/" (md5 "pwd"))))]
+    (let [response (non-secure-app (mock/request :post "/api/user" {"id" "nickname", "fname" "john", "lname" "doe", "pwd" (encrypt "pwd")}))]
       (is (= (:status response) 409))
       (is (= (:body response) "already exists")))))
 

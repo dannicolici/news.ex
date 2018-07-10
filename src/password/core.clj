@@ -1,7 +1,6 @@
 (ns password.core
-  (:import (java.security MessageDigest)))
+  (:require [cemerick.friend.credentials :as creds]))
 
-(defn md5 [^String s]
-  (let [algorithm (MessageDigest/getInstance "MD5")
-        raw (.digest algorithm (.getBytes s))]
-    (format "%032x" (BigInteger. 1 raw))))
+(defn encrypt [pwd] (creds/hash-bcrypt pwd))
+
+(defn matches [text crypted] (creds/bcrypt-verify text crypted))
