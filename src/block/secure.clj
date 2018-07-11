@@ -1,23 +1,22 @@
 (ns block.secure
   (:require [block.api :as api]
+            [persistence.core :as db]
             [compojure.core :refer :all]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+            [ring.middleware.json :refer [wrap-json-response]]
             [cemerick.friend [workflows :as workflows] [credentials :as creds]]
             [cemerick.friend :as friend]
-            [compojure.route :as route]
-            [ring.middleware.json :refer [wrap-json-response]]))
+            [compojure.route :as route]))
 
-(def users {"root" {:username "root"
-                    :password (creds/hash-bcrypt "admin_password")
-                    :roles    #{::admin}}
-            "jane" {:username "jane"
-                    :password (creds/hash-bcrypt "user_password")
-                    :roles    #{::user}}})
-
+(defn user [id]
+  "Looks up a user by id and transforms it to a friend auth map
+   with 'user' role"
+  (let [usr (db/get-user-by-id id)]
+    (hash-map :username (:id usr), :password (:password usr), :roles #{::user})))
 
 (defroutes app-routes
            api/api-routes
@@ -35,7 +34,7 @@
            (-> (wrap-routes app-routes
                             friend/wrap-authorize
                             #{::user})
-               (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn users)
+               (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn user)
                                      :workflows     [(workflows/interactive-form)]})
                wrap-session
                wrap-params
@@ -57,6 +56,7 @@
            wrap-root
            wrap-json-response))
 
-
+(defn -main [& args]
+  (run-jetty #'app {:port 8080}))
 
 

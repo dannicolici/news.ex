@@ -67,17 +67,16 @@
 (defn get-news-by-user-id [user-id]
   (map get-news-by-id (get-by-id* user-id usr-news-key)))
 
-(defn -main [& args]
+(defn -xmain [& args]
   (flush-db)
-  (println (save-user! (user "firstuser" "fname" "lname" (md5 "pwd"))))
-  (println (save-user! (user "seconduser" "xxxxx" "aaa" (md5 "pwd3"))))
+  (println (save-user! (user "firstuser" "fname" "lname" (encrypt "pwd"))))
+  (println (save-user! (user "seconduser" "xxxxx" "aaa" (encrypt "pwd3"))))
   (println (save-news! (news nil "firstuser" "some text")))
   (println (save-news! (news nil "firstuser" "news two")))
   (println (save-news! (news nil "seconduser" "wowowiwa")))
-  (println (save-news! (news nil "seconduser" "kiki koko")))
-  (println (get-all-users)))
-  ;(init-id-seq)
-  ;(println (str "id: " (new-id))))
-  ;(wcar* (car/flushdb)))
+  (println (save-news! (news nil "seconduser" "kiki koko"))))
+;(init-id-seq)
+;(println (str "id: " (new-id))))
+;(wcar* (car/flushdb)))
 
 

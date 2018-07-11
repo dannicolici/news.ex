@@ -12,6 +12,7 @@
                  [compojure "1.6.0"]
                  [ring/ring-defaults "0.3.1"]
                  [ring/ring-json "0.4.0"]
+                 [ring/ring-jetty-adapter "1.7.0-RC1"]
                  [cljs-ajax "0.7.3"]
                  [com.taoensso/carmine "2.18.1"]
                  [reagent "0.8.1"]
