@@ -20,10 +20,10 @@
 
 (defroutes app-routes
            api/api-routes
+           (GET "/news" [] "<html><head><title>News</title></head><body><div id=\"root\"></div><script src=\"js/main.js\"></script><script>news.core.start()</script></body></html>")
            (friend/logout (POST "/logout" [] "Logged out")))
 
 (defroutes public-routes
-           (GET "/logout" [] "<form action=\"logout\" method=\"post\"><button>Logout</button></form>")
            (GET "/login" [] "<form action=\"login\" method=\"post\"><input type=\"text\" name=\"username\"/><input type=\"text\" name=\"password\"/><button>Login</button></form>"))
 
 
