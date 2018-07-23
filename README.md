@@ -2,7 +2,7 @@
 
 This project is part of my clojure learning experience.
 What's in here is a full-stack, cljs/clojure/redis solution
-for a simple user/posts scenario.
+for a simple user/news-posting scenario.
 
 Functionality and UI wise, it's as simple as it gets.
 It's the whole full-stack aspect that I was more interested
