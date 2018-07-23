@@ -1,6 +1,6 @@
 (ns api.secure
   (:require [api.core :as api]
-            [persistence.core :as db]
+            [infrastructure.persistence :as db]
             [compojure.core :refer :all]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.adapter.jetty :refer [run-jetty]]

@@ -1,7 +1,7 @@
-(ns api.handler-test
+(ns api.functional-test
   (:require [api.core :refer :all]
-            [password.core :refer :all]
-            [persistence.core :as p :refer :all]
+            [infrastructure.password :refer :all]
+            [infrastructure.persistence :as p :refer :all]
             [clojure.test :refer :all]
             [ring.mock.request :as mock]
             [clojure.string :as str]))

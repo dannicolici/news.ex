@@ -1,7 +1,7 @@
-(ns persistence.core
+(ns infrastructure.persistence
   (:require [taoensso.carmine :as car :refer (wcar)]
             [domain.entities :refer :all]
-            [password.core :refer :all])
+            [infrastructure.password :refer :all])
   (:gen-class))
 
 
