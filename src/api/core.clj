@@ -1,7 +1,7 @@
-(ns block.api
-  (:require [news.core :as news :refer :all]
+(ns api.core
+  (:require [domain.news :as news :refer :all]
+            [domain.entities :as d :refer :all]
             [persistence.core :as p :refer :all]
-            [domain.core :as d :refer :all]
             [compojure.core :refer :all]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.util.response :as r :refer :all]

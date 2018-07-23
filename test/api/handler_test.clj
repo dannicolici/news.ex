@@ -1,9 +1,9 @@
-(ns block.handler-test
-  (:require [clojure.test :refer :all]
-            [persistence.core :as p :refer :all]
-            [ring.mock.request :as mock]
-            [block.api :refer :all]
+(ns api.handler-test
+  (:require [api.core :refer :all]
             [password.core :refer :all]
+            [persistence.core :as p :refer :all]
+            [clojure.test :refer :all]
+            [ring.mock.request :as mock]
             [clojure.string :as str]))
 
 (defn data-fixture [f]

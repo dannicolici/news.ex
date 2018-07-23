@@ -1,5 +1,5 @@
-(ns block.secure
-  (:require [block.api :as api]
+(ns api.secure
+  (:require [api.core :as api]
             [persistence.core :as db]
             [compojure.core :refer :all]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]

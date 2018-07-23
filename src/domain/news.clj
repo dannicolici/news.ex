@@ -1,4 +1,4 @@
-(ns news.core
+(ns domain.news
   (:require [persistence.core :as p :refer :all])
   (:gen-class))
 

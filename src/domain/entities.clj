@@ -1,4 +1,4 @@
-(ns domain.core
+(ns domain.entities
   (:require [java-time :as t]))
 
 (defrecord User
