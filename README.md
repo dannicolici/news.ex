@@ -13,6 +13,8 @@ It uses cemerik.friend for securing the app.
 
 ## Prerequisites
 
+Knowledge of clojure, leiningen, redis.
+
 You will need Leiningen 2.0.0 or above installed.
 https://leiningen.org/
 
