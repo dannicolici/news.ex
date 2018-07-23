@@ -13,14 +13,15 @@
 (defn flush-db [] (wcar* (car/flushdb)))
 
 (def usr-pref "usr:")
-(defn usr-key [id] (str usr-pref id))
-(defn news-key [id] (str "nws:" id))
-(defn usr-news-key [usr-id] (str "u-n:" usr-id))
+(defn- usr-key [id] (str usr-pref id))
+(defn- news-key [id] (str "nws:" id))
+(defn- usr-news-key [usr-id] (str "u-n:" usr-id))
 
-(defn init-id-seq! []
-  (wcar* (car/set id-seq 0)))
+(defn- init-id-seq! []
+  (if (nil? (wcar* (car/get id-seq)))
+    (wcar* (car/set id-seq 0))))
 
-(defn new-id! []
+(defn- new-id! []
   (let [[_ id]
         (wcar* (car/incr id-seq)
                (car/get id-seq))]
@@ -43,6 +44,8 @@
 (defn get-user-by-id [id] (get-entity-by-id id usr-key map->User))
 
 (defn get-all-users []
+  "in production, we'd normally use cursors and avoid
+  selecting everything like this"
   (map
     #(get-entity-by-id (clojure.string/replace % usr-pref "") usr-key map->User)
     (wcar* (car/keys (str usr-pref "*")))))
@@ -67,16 +70,16 @@
 (defn get-news-by-user-id [user-id]
   (map get-news-by-id (get-by-id* user-id usr-news-key)))
 
-(defn -xmain [& args]
-  (flush-db)
-  (println (save-user! (user "firstuser" "fname" "lname" (encrypt "pwd"))))
-  (println (save-user! (user "seconduser" "xxxxx" "aaa" (encrypt "pwd3"))))
-  (println (save-news! (news nil "firstuser" "some text")))
-  (println (save-news! (news nil "firstuser" "news two")))
-  (println (save-news! (news nil "seconduser" "wowowiwa")))
-  (println (save-news! (news nil "seconduser" "kiki koko"))))
-;(init-id-seq)
-;(println (str "id: " (new-id))))
-;(wcar* (car/flushdb)))
+(defn init-db []
+  (init-id-seq!)
+  (if (= 1 (save-user! (user "firstuser" "fname" "lname" (encrypt "pwd"))))
+    (do
+      (save-news! (news nil "firstuser" "some text"))
+      (save-news! (news nil "firstuser" "news two"))))
+
+  (if (= 1 (save-user! (user "seconduser" "xxxxx" "aaa" (encrypt "pwd"))))
+    (do
+      (save-news! (news nil "seconduser" "this is awsome!"))
+      (save-news! (news nil "seconduser" "this is not old news...")))))
 
 

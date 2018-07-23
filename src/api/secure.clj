@@ -57,6 +57,7 @@
            wrap-json-response))
 
 (defn -main [& args]
+  (db/init-db)
   (run-jetty #'app {:port 8080}))
 
 
