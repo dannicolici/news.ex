@@ -4,13 +4,22 @@
             [infrastructure.persistence :as p :refer :all]
             [clojure.test :refer :all]
             [ring.mock.request :as mock]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import (redis.embedded RedisServer)))
+
+(def redis-server (RedisServer. (Integer. 6379)))
+
+(defn wrap-all-tests [f]
+  (.start redis-server)
+  (f)
+  (.stop redis-server))
 
 (defn data-fixture [f]
   (p/flush-db)
   (f)
   (p/flush-db))
 
+(use-fixtures :once wrap-all-tests)
 (use-fixtures :each data-fixture)
 
 (defn create-and-assert-user [id]
