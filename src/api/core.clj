@@ -2,10 +2,16 @@
   (:require [domain.news :as news :refer :all]
             [domain.entities :as d :refer :all]
             [infrastructure.persistence :as p :refer :all]
+            [infrastructure.auth :as auth]
             [compojure.core :refer :all]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.util.response :as r :refer :all]
             [ring.middleware.json :refer [wrap-json-response]]))
+
+(defn save-news [user-id text]
+  (if (= 1 (p/save-news! (d/news nil user-id text)))
+    (r/status {:body "created"} 201)
+    (r/status {:body "user doesn't exist"} 409)))
 
 (defroutes api
            (context "/api" []
@@ -15,9 +21,10 @@
                  (r/status {:body "already exists"} 409)))
 
              (POST "/news/:user-id" [user-id text]
-               (if (= 1 (p/save-news! (d/news nil user-id text)))
-                 (r/status {:body "created"} 201)
-                 (r/status {:body "user doesn't exist"} 409)))
+               (save-news user-id text))
+
+             (POST "/news" [text :as request]
+               (save-news (auth/get-current-username request) text))
 
              (GET "/news/:user-id" [user-id]
                (r/response
@@ -31,6 +38,6 @@
 
 (defroutes non-secure-app (->
                             (wrap-defaults api-routes
-                              (assoc-in site-defaults [:security :anti-forgery] false))
+                                           (assoc-in site-defaults [:security :anti-forgery] false))
                             wrap-json-response))
 

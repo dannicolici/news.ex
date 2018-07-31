@@ -1,7 +1,8 @@
 (ns news.core
   (:require [ajax.core :refer [GET POST]]
             [reagent.core :as r]
-            [cognitect.transit :as t]))
+            [cognitect.transit :as t]
+            [clojure.core.async :refer [go <! timeout]]))
 
 (defn console [& args]
   (.log js/console (str args)))
@@ -12,21 +13,44 @@
 (def as-json (t/reader :json))
 (def feed (r/atom nil))
 (defn feed-map [] (t/read as-json @feed))
+(def current-post (r/atom nil))
 
 (defn get-all-news []
   (GET "/api/news"
     {:handler       (fn [r] (reset! feed r))
      :error-handler error-handler}))
 
-(defn news-app []
-  (get-all-news)
-  (fn [] [:div
-          [:ul {:id "news"}
-           (for [news (feed-map)]
-             ^{:key (get news "id")}
-             [:li (get news "text") " - " (get news "user-id")])]]))
+(defn post-news [news]
+  (POST "/api/news" {:format :raw
+                     :params {:text news}})
+  (go
+    (<! (timeout 500))
+    (get-all-news)))
 
+
+
+(defn news-reader []
+  [:div
+   [:ul {:id "news-reader"}
+    (for [news (feed-map)]
+      ^{:key (get news "id")}
+      [:li (get news "date-time") ": " (get news "text") " - " (get news "user-id")])]])
+
+
+(defn news-poster []
+  [:div
+   [:input {:type "text"
+            :value @current-post
+            :on-change #(reset! current-post (-> % .-target .-value))}]
+   [:input {:type "button" :value "Post"
+            :on-click #(post-news @current-post)}]])
+
+(defn news-app []
+  [:div
+     [news-poster]
+     [news-reader]])
 
 (defn ^:export start []
+  (get-all-news)
   (r/render-component [news-app]
                       (.getElementById js/document "root")))
