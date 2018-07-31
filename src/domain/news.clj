@@ -5,6 +5,6 @@
   (p/get-news-by-user-id user-id))
 
 (defn all-news []
-  (sort-by #(:id %)
+  (sort-by #(read-string (:id %))
            (mapcat #(news-for-user (:id %))
                    (p/get-all-users))))
