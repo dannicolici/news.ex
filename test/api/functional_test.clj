@@ -52,6 +52,7 @@
   (testing "post news for non-existing user"
     (let [response (non-secure-app (mock/request :post "/api/news/non-existing-user" {"text" "some news text"}))]
       (is (= (:status response) 409))))
+
   (testing "post news for existing user"
     (create-and-assert-user "zzz")
     (create-and-assert-news "zzz" {"text" "some news text"})
@@ -63,4 +64,18 @@
       (is (= (:status response) 200))
       (is (let [resp (:body response)]
             (and (str/includes? resp "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")
-                 (str/includes? resp "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\"")))))))
+                 (str/includes? resp "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\""))))))
+
+  (testing "user in session can post news"
+    (let [request (mock/request :post "/api/news")
+          session-request (assoc-in request [:session :cemerick.friend/identity :current] "zzz")
+          params-request (assoc-in session-request [:params] {"text" "user in session"})
+          response (api-routes params-request)] ;we need to bypass ring's wrap-session to mock the session
+      (is (= (:status response) 201))
+      (is (= (:body response) "created")))
+    (let [response (non-secure-app (mock/request :get "/api/news/zzz"))]
+      (is (= (:status response) 200))
+      (is (let [resp (:body response)]
+            (and (str/includes? resp "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")
+                 (str/includes? resp "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\"")
+                 (str/includes? resp "{\"id\":\"3\",\"user-id\":\"zzz\",\"text\":\"user in session\"")))))))
