@@ -17,17 +17,17 @@
 
 (defn get-all-news []
   (GET "/api/news"
-    {:handler       (fn [r] (reset! feed r))
-     :error-handler error-handler}))
+       {:handler       (fn [r] (reset! feed r))
+        :error-handler error-handler}))
 
-(defn post-news [news]
-  (POST "/api/news" {:format :raw
-                     :params {:text news}})
+(defn refresh-news []
   (go
     (<! (timeout 500))
     (get-all-news)))
 
-
+(defn post-news [news]
+  (POST "/api/news" {:format :raw
+                     :params {:text news}}))
 
 (defn news-reader []
   [:div
@@ -36,19 +36,20 @@
       ^{:key (get news "id")}
       [:li (get news "date-time") ": " (get news "text") " - " (get news "user-id")])]])
 
-
 (defn news-poster []
   [:div
-   [:input {:type "text"
-            :value @current-post
+   [:input {:type      "text"
+            :value     @current-post
             :on-change #(reset! current-post (-> % .-target .-value))}]
-   [:input {:type "button" :value "Post"
-            :on-click #(post-news @current-post)}]])
+   [:input {:type     "button" :value "Post"
+            :on-click #(do
+                         (post-news @current-post)
+                         (refresh-news))}]])
 
 (defn news-app []
   [:div
-     [news-poster]
-     [news-reader]])
+   [news-poster]
+   [news-reader]])
 
 (defn ^:export start []
   (get-all-news)
