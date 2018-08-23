@@ -29,4 +29,4 @@
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]
-                        [com.github.kstyrc/embedded-redis "0.6"]]}})
+                        [com.github.kstyrc/embedded-redis "0.6" :exclusions [com.google.guava/guava]]]}})
