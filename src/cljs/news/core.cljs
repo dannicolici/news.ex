@@ -23,7 +23,7 @@
 (def as-json (t/reader :json))
 (def feed (r/atom nil))
 (defn feed-map [] (t/read as-json @feed))
-(def current-post (r/atom nil))
+(def current-post (r/atom ""))
 
 (defn get-all-news []
   (GET "/api/news"
@@ -49,16 +49,14 @@
                   (news-timestamp-cell (get news "date-time")))))))
 
 (defn news-poster []
-  ; TODO how are event handlers supported by shadow?
-  [:div
-   [:input {:type      "text"
-            :value     @current-post
-            :on-change #(reset! current-post (-> % .-target .-value))}]
-   [:input {:type     "button"
-            :value    "Post"
-            :on-click #(do
-                         (post-news @current-post)
-                         (refresh-news))}]])
+  (news-form
+    (news-form-text {:value    @current-post
+                     :onChange #(reset! current-post (-> % .-target .-value))})
+    (news-form-submit {:type    "button"
+                       :value   "Post"
+                       :onClick #(do
+                                   (post-news @current-post)
+                                   (refresh-news))})))
 
 (defn vertical-space []
   (empty-panel ""))
