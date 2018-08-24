@@ -19,7 +19,8 @@
                  [reagent "0.8.1"]
                  [com.cognitect/transit-cljs "0.8.256"]
                  [clojure.java-time "0.3.2"]
-                 [com.cemerick/friend "0.2.3"]]
+                 [com.cemerick/friend "0.2.3"]
+                 [thheller/shadow-client "1.3.2"]]
 
   :plugins [[lein-ring "0.12.4"]
             [lein-cljsbuild "1.1.7"]]

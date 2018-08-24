@@ -2,7 +2,17 @@
   (:require [ajax.core :refer [GET POST]]
             [reagent.core :as r]
             [cognitect.transit :as t]
-            [clojure.core.async :refer [go <! timeout]]))
+            [clojure.core.async :refer [go <! timeout]]
+            [news.style :refer [news-table
+                                news-table-body
+                                news-text-cell
+                                news-user-cell
+                                news-timestamp-cell
+                                news-row
+                                news-form
+                                news-form-text
+                                news-form-submit
+                                empty-panel]]))
 
 (defn console [& args]
   (.log js/console (str args)))
@@ -30,25 +40,33 @@
                      :params {:text news}}))
 
 (defn news-reader []
-  [:div
-   [:ul {:id "news-reader"}
-    (for [news (feed-map)]
-      ^{:key (get news "id")}
-      [:li (get news "date-time") ": " (get news "text") " - " (get news "user-id")])]])
+  (news-table
+    (news-table-body
+      (for [news (feed-map)]
+        (news-row {:key (get news "id")}
+                  (news-text-cell (get news "text"))
+                  (news-user-cell (get news "user-id"))
+                  (news-timestamp-cell (get news "date-time")))))))
 
 (defn news-poster []
+  ; TODO how are event handlers supported by shadow?
   [:div
    [:input {:type      "text"
             :value     @current-post
             :on-change #(reset! current-post (-> % .-target .-value))}]
-   [:input {:type     "button" :value "Post"
+   [:input {:type     "button"
+            :value    "Post"
             :on-click #(do
                          (post-news @current-post)
                          (refresh-news))}]])
 
+(defn vertical-space []
+  (empty-panel ""))
+
 (defn news-app []
   [:div
    [news-poster]
+   [vertical-space]
    [news-reader]])
 
 (defn ^:export start []
