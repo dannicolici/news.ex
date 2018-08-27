@@ -5,10 +5,13 @@
             [clojure.core.async :refer [go <! timeout]]
             [news.style :refer [news-table
                                 news-table-body
+                                simple-header-cell
+                                sorting-header-cell
                                 news-text-cell
                                 news-user-cell
                                 news-timestamp-cell
                                 news-row
+                                simple-row
                                 news-form
                                 news-form-text
                                 news-form-submit
@@ -21,13 +24,12 @@
   (console "something went wrong: " status " " status-text))
 
 (def as-json (t/reader :json))
-(def feed (r/atom nil))
-(defn feed-map [] (t/read as-json @feed))
+(def feed-map (r/atom {}))
 (def current-post (r/atom ""))
 
 (defn get-all-news []
   (GET "/api/news"
-       {:handler       (fn [r] (reset! feed r))
+       {:handler       (fn [r] (reset! feed-map (t/read as-json r)))
         :error-handler error-handler}))
 
 (defn refresh-news []
@@ -39,10 +41,17 @@
   (POST "/api/news" {:format :raw
                      :params {:text news}}))
 
+(defn sort-news [feed field]
+  (sort-by (fn [n] (get n field)) feed))
+
 (defn news-reader []
   (news-table
     (news-table-body
-      (for [news (feed-map)]
+      (simple-row {:key "news-header"}
+        (simple-header-cell "")
+        (sorting-header-cell {:onClick #(swap! feed-map sort-news "user-id")} "written by")
+        (sorting-header-cell {:onClick #(swap! feed-map sort-news "date-time")} "on date"))
+      (for [news @feed-map]
         (news-row {:key (get news "id")}
                   (news-text-cell (get news "text"))
                   (news-user-cell (get news "user-id"))
