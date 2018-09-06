@@ -14,6 +14,7 @@
                  [ring/ring-json "0.4.0"]
                  [ring/ring-jetty-adapter "1.7.0-RC1"]
                  [cljs-ajax "0.7.3"]
+                 [hiccup "1.0.5"]
                  [org.clojure/core.async "0.4.474"]
                  [com.taoensso/carmine "2.18.1"]
                  [reagent "0.8.1"]

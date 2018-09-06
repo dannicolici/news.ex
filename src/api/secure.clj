@@ -10,7 +10,8 @@
             [ring.middleware.json :refer [wrap-json-response]]
             [cemerick.friend [workflows :as workflows] [credentials :as creds]]
             [cemerick.friend :as friend]
-            [compojure.route :as route]))
+            [compojure.route :as route]
+            [hiccup.core :refer :all]))
 
 (defn user [id]
   "Looks up a user by id and transforms it to a friend auth map
@@ -18,13 +19,23 @@
   (let [usr (db/get-user-by-id id)]
     (hash-map :username (:id usr), :password (:password usr), :roles #{::user})))
 
+(defn from-cljs [cljs-namespace page-title]
+  "Uses main.js to inject content defined in cljs-namespace
+   into a div DOM element, with id=root"
+  (html [:head [:title page-title]]
+        [:body
+         [:div {:id "root"}]
+         [:script {:src "js/main.js"}]
+         [:script (str cljs-namespace ".start()")]]))
+
 (defroutes app-routes
            api/api-routes
-           (GET "/news" [] "<html><head><title>News</title></head><body><div id=\"root\"></div><script src=\"js/main.js\"></script><script>news.core.start()</script></body></html>")
+           (GET "/news" [] (from-cljs "news.core" "News"))
            (friend/logout (POST "/logout" [] "Logged out")))
 
 (defroutes public-routes
-           (GET "/login" [] "<form action=\"login\" method=\"post\"><input type=\"text\" name=\"username\"/><input type=\"text\" name=\"password\"/><button>Login</button></form>"))
+           (GET "/" [] (from-cljs "menu.core" "Menu"))
+           (GET "/login" [] (from-cljs "menu.login" "Login")))
 
 
 (defroutes static-routes
@@ -40,12 +51,6 @@
                wrap-params
                wrap-keyword-params))
 
-(defn- wrap-root [handler]
-  (fn [req]
-    (handler
-      (update-in req [:uri]
-                 #(if (= "/" %) "/index.html" %)))))
-
 (def app (->
            (routes
              static-routes
@@ -53,7 +58,6 @@
              (wrap-defaults secured-app-routes
                             (assoc-in site-defaults [:security :anti-forgery] false))
              (route/not-found "Not Found"))
-           wrap-root
            wrap-json-response))
 
 (defn -main [& args]
