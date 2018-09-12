@@ -34,9 +34,9 @@
                (r/response
                  (if (empty? params)
                      (news/all-news)
-                     (news/all-news (keyword (:sort-by params))
-                                    (Integer/parseInt (:page-size params))
-                                    (Integer/parseInt (:page params))))))))
+                     (news/paginated-news (keyword (:sort-by params))
+                                          (Integer/parseInt (:page-size params))
+                                          (Integer/parseInt (:page params))))))))
 
 (defroutes api-routes api)
 
