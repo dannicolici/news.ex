@@ -79,4 +79,49 @@
       (is (let [resp (:body response)]
             (and (str/includes? resp "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")
                  (str/includes? resp "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\"")
+                 (str/includes? resp "{\"id\":\"3\",\"user-id\":\"zzz\",\"text\":\"user in session\""))))))
+
+  (testing "get all news"
+    (let [response (non-secure-app (mock/request :get "/api/news"))]
+      (is (= (:status response) 200))
+      (is (let [resp (:body response)]
+            (and (str/includes? resp "{\"id\":\"1\",\"user-id\":\"zzz\",\"text\":\"some news text\"")
+                 (str/includes? resp "{\"id\":\"2\",\"user-id\":\"zzz\",\"text\":\"news2\"")
                  (str/includes? resp "{\"id\":\"3\",\"user-id\":\"zzz\",\"text\":\"user in session\"")))))))
+
+(deftest pagination
+  (testing "news can be paginated"
+    (create-user-and-assert-response "pagUsr2")
+    (create-news-and-assert-response "pagUsr2" {"text" "u2news1 text"})
+    (create-news-and-assert-response "pagUsr2" {"text" "u2news2 text"})
+    (create-news-and-assert-response "pagUsr2" {"text" "u2news3 text"})
+    (create-user-and-assert-response "pagUsr1")
+    (create-news-and-assert-response "pagUsr1" {"text" "u1news1 text"})
+    (create-news-and-assert-response "pagUsr1" {"text" "u1news2 text"})
+    (create-news-and-assert-response "pagUsr1" {"text" "u1news3 text"})
+    (let [response (non-secure-app (mock/request :get "/api/news" {
+                                                                   "sort-by" "user-id"
+                                                                   "page-size" "2"
+                                                                   "page" "1"}))]
+      (is (= (:status response) 200))
+      (let [resp (:body response)]
+        (is (and (str/includes? resp "{\"id\":\"4\",\"user-id\":\"pagUsr1\",\"text\":\"u1news1 text\"")
+                 (str/includes? resp "{\"id\":\"5\",\"user-id\":\"pagUsr1\",\"text\":\"u1news2 text\"")
+                 (not (str/includes? resp "u1news3"))
+                 (not (str/includes? resp "u2news"))
+                 (str/includes? resp "\"pages\":3"))
+            resp)))
+    (let [response (non-secure-app (mock/request :get "/api/news" {
+                                                                   "sort-by" "user-id"
+                                                                   "page-size" "2"
+                                                                   "page" "2"}))]
+      (is (= (:status response) 200))
+      (let [resp (:body response)]
+        (is (and (str/includes? resp "{\"id\":\"6\",\"user-id\":\"pagUsr1\",\"text\":\"u1news3 text\"")
+                 (str/includes? resp "{\"id\":\"1\",\"user-id\":\"pagUsr2\",\"text\":\"u2news1 text\"")
+                 (not (str/includes? resp "u1news1"))
+                 (not (str/includes? resp "u1news2"))
+                 (not (str/includes? resp "u2news2"))
+                 (not (str/includes? resp "u2news3"))
+                 (str/includes? resp "\"pages\":3"))
+            resp)))))

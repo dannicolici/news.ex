@@ -30,9 +30,13 @@
                (r/response
                  (news/news-for-user user-id)))
 
-             (GET "/news" []
+             (GET "/news" [:as {params :params}]
                (r/response
-                 (news/all-news)))))
+                 (if (empty? params)
+                     (news/all-news)
+                     (news/all-news (keyword (:sort-by params))
+                                    (Integer/parseInt (:page-size params))
+                                    (Integer/parseInt (:page params))))))))
 
 (defroutes api-routes api)
 
