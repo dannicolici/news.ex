@@ -76,6 +76,22 @@
             :background-color "#f0f8ff"
             :box-shadow       "0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19)"})
 
+; ---------- pagination ----------
+(defstyled pagination-panel :nav
+           [env]
+           {})
+
+(defstyled page-link :small
+           [env]
+           {:cursor   "pointer"
+            :padding  "0 10px"
+            :color    "#aa5522"
+            "&:hover" {:background-color "#f0f8ff"}})
+
+(defstyled page-link-inactive :small
+           [env]
+           {:padding "0 10px"})
+
 ; ---------- common ----------
 (defstyled empty-panel :div
            [env]
