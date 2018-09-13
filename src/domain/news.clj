@@ -4,7 +4,7 @@
 (defn news-for-user [user-id]
   (p/get-news-by-user-id user-id))
 
-(defn all-news-sorted-by [criteria]
+(defn- all-news-sorted-by [criteria]
   (sort-by #(read-string (criteria %))
            (mapcat #(news-for-user (:id %))
                    (p/get-all-users))))
