@@ -1,6 +1,6 @@
 (ns api.functional-test
   (:require [api.core :refer :all]
-            [infrastructure.password :refer :all]
+            [infrastructure.password :refer [matches]]
             [infrastructure.persistence :as p :refer :all]
             [clojure.test :refer :all]
             [ring.mock.request :as mock]
@@ -23,7 +23,7 @@
 (use-fixtures :each data-fixture)
 
 (defn create-user-and-assert-response [id]
-  (let [response (non-secure-app (mock/request :post "/api/user" {"id" id, "fname" "john", "lname" "doe", "pwd" (encrypt "pwd")}))]
+  (let [response (non-secure-app (mock/request :post "/api/user" {"id" id, "fname" "john", "lname" "doe", "pwd" "pwd"}))]
     (is (= (:status response) 201))
     (is (= (:body response) "created"))))
 
@@ -44,7 +44,7 @@
       (is (matches "pwd" (:password user)))))
 
   (testing "put same user"
-    (let [response (non-secure-app (mock/request :post "/api/user" {"id" "nickname", "fname" "john", "lname" "doe", "pwd" (encrypt "pwd")}))]
+    (let [response (non-secure-app (mock/request :post "/api/user" {"id" "nickname", "fname" "john", "lname" "doe", "pwd" "pwd"}))]
       (is (= (:status response) 409))
       (is (= (:body response) "already exists")))))
 
@@ -71,7 +71,7 @@
     (let [request (mock/request :post "/api/news")
           session-request (assoc-in request [:session :cemerick.friend/identity :current] "zzz")
           params-request (assoc-in session-request [:params] {"text" "user in session"})
-          response (api-routes params-request)]
+          response (news-api-routes params-request)]
       (is (= (:status response) 201))
       (is (= (:body response) "created")))
     (let [response (non-secure-app (mock/request :get "/api/news/zzz"))]

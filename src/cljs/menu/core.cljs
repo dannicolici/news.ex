@@ -3,6 +3,8 @@
 
 (defn menu-app []
   [:div
+   [:a {:href "register"} "Register"]
+   [:br]
    [:a {:href "login"} "Login"]
    [:br]
    [:form {:action "logout" :method "post"} [:button "Logout"]]

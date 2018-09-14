@@ -29,12 +29,14 @@
          [:script (str cljs-namespace ".start()")]]))
 
 (defroutes app-routes
-           api/api-routes
+           api/news-api-routes
            (GET "/news" [] (from-cljs "news.core" "News"))
            (friend/logout (POST "/logout" [] "Logged out")))
 
 (defroutes public-routes
+           api/user-api-routes
            (GET "/" [] (from-cljs "menu.core" "Menu"))
+           (GET "/register" [] (from-cljs "menu.register" "Register"))
            (GET "/login" [] (from-cljs "menu.login" "Login")))
 
 
@@ -54,8 +56,8 @@
 (def app (->
            (routes
              static-routes
-             public-routes
-             (wrap-defaults secured-app-routes
+             (wrap-defaults (routes public-routes
+                                    secured-app-routes)
                             (assoc-in site-defaults [:security :anti-forgery] false))
              (route/not-found "Not Found"))
            wrap-json-response))
