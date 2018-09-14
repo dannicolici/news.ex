@@ -1,6 +1,7 @@
 (ns infrastructure.persistence
   (:require [taoensso.carmine :as car :refer (wcar)]
-            [domain.entities :refer :all])
+            [domain.entities :refer :all]
+            [infrastructure.password :refer :all])
   (:gen-class))
 
 
@@ -71,12 +72,12 @@
 
 (defn init-db []
   (init-id-seq!)
-  (if (= 1 (save-user! (user "firstuser" "fname" "lname" "pwd")))
+  (if (= 1 (save-user! (user "firstuser" "fname" "lname" (encrypt "pwd"))))
     (do
       (save-news! (news nil "firstuser" "some text"))
       (save-news! (news nil "firstuser" "news two"))))
 
-  (if (= 1 (save-user! (user "seconduser" "xxxxx" "aaa" "pwd")))
+  (if (= 1 (save-user! (user "seconduser" "xxxxx" "aaa" (encrypt "pwd"))))
     (do
       (save-news! (news nil "seconduser" "this is awsome!"))
       (save-news! (news nil "seconduser" "this is not old news...")))))
