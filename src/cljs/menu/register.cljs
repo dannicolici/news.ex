@@ -24,8 +24,9 @@
                                  (.-value (elem "lname"))
                                  (.-value (elem "pwd")))} "Register"]
    (if @registerSuccess
-         [:div [:br][:br] "Registered!" [:a {:href "/"} " << Back"]]
-         [:div [:br][:br] "Not registered!"])])
+         [:div [:br][:br] "Registered!" [:a {:href "news"} " Go to news"]]
+         [:div [:br][:br] "Not registered!"])
+   [:br][:a {:href "/"} " << Back to menu"]])
 
 
 (defn ^:export start []

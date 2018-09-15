@@ -5,7 +5,8 @@
   [:form {:action "login" :method "post"}
    [:input {:type "text" :name "username"}]
    [:input {:type "password" :name "password"}]
-   [:button "Login"]])
+   [:button "Login"]
+   [:br][:a {:href "/"} " << Back to menu"]])
 
 (defn ^:export start []
   (r/render-component [login-app]

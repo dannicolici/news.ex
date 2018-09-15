@@ -2,14 +2,16 @@
   (:require [reagent.core :as r]))
 
 (defn menu-app []
-  [:div
-   [:a {:href "register"} "Register"]
-   [:br]
-   [:a {:href "login"} "Login"]
-   [:br]
-   [:form {:action "logout" :method "post"} [:button "Logout"]]
-   [:br]
-   [:a {:href "news"} "News"]])
+  [:table
+   [:tr
+    [:td
+     [:div
+      [:a {:href "register"} "Register"]]
+     [:div
+      [:a {:href "login"} "Login"]]]
+    [:td
+     "Use the menu items on the left to authenticate and read/post "
+     [:a {:href "news"} "The News"]]]])
 
 (defn ^:export start []
   (r/render-component [menu-app]

@@ -110,7 +110,10 @@
    [news-poster]
    [vertical-space]
    [news-reader]
-   [page-links]])
+   [page-links]
+   [vertical-space]
+   [:form {:action "logout" :method "post"} [:button "Logout"]]])
+
 
 (defn ^:export start []
   (get-paginated-news)

@@ -28,16 +28,21 @@
          [:script {:src "js/main.js"}]
          [:script (str cljs-namespace ".start()")]]))
 
+(def news-page (from-cljs "news.core" "News"))
+(def menu-page (from-cljs "menu.core" "Menu"))
+(def login-page (from-cljs "menu.login" "Login"))
+(def register-page (from-cljs "menu.register" "Register"))
+
 (defroutes app-routes
            api/news-api-routes
-           (GET "/news" [] (from-cljs "news.core" "News"))
-           (friend/logout (POST "/logout" [] "Logged out")))
+           (GET "/news" [] news-page)
+           (friend/logout (POST "/logout" [] menu-page)))
 
 (defroutes public-routes
            api/user-api-routes
-           (GET "/" [] (from-cljs "menu.core" "Menu"))
-           (GET "/register" [] (from-cljs "menu.register" "Register"))
-           (GET "/login" [] (from-cljs "menu.login" "Login")))
+           (GET "/" [] menu-page)
+           (GET "/register" [] register-page)
+           (GET "/login" [] login-page))
 
 
 (defroutes static-routes
