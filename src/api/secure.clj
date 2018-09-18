@@ -16,8 +16,9 @@
 (defn user [id]
   "Looks up a user by id and transforms it to a friend auth map
    with 'user' role"
-  (let [usr (db/get-user-by-id id)]
-    (hash-map :username (:id usr), :password (:password usr), :roles #{::user})))
+  (if-let [usr (db/get-user-by-id id)]
+    (hash-map :username (:id usr), :password (:password usr), :roles #{::user})
+    nil))
 
 (defn from-cljs [cljs-namespace page-title]
   "Uses main.js to inject content defined in cljs-namespace

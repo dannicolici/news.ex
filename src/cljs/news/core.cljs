@@ -91,8 +91,9 @@
 (defn page-element [page-no]
   (let [p (inc page-no)]
     (if (= p @current-page)
-      (page-link-inactive p)
-      (page-link {:onClick #(do
+      (page-link-inactive {:key p} p)
+      (page-link {:key p
+                  :onClick #(do
                               (reset! current-page p)
                               (get-paginated-news))}
                  p))))
