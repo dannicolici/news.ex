@@ -1,6 +1,16 @@
 (ns news.style
   (:require [shadow.markup.css :refer (defstyled)]))
 
+(def header-cell-properties {:font-size     10
+                             :color         "#aaaaaa"
+                             :border-bottom "1px solid #ddd"
+                             :text-align    "right"})
+
+(def user-cell-properties {:font-size     10
+                           :color         "grey"
+                           :border-bottom "1px solid #ddd"
+                           :text-align    "right"})
+
 
 ; ---------- news reader ----------
 (defstyled news-table :table
@@ -23,18 +33,12 @@
 
 (defstyled simple-header-cell :th
            [env]
-           {:font-size     10
-            :color         "#aaaaaa"
-            :border-bottom "1px solid #ddd"
-            :text-align    "right"})
+           header-cell-properties)
 
 (defstyled sorting-header-cell :th
            [env]
-           {:font-size     10
-            :color         "#aaaaaa"
-            :border-bottom "1px solid #ddd"
-            :text-align    "right"
-            :cursor        "pointer"})
+           (assoc header-cell-properties
+             :cursor "pointer"))
 
 (defstyled news-text-cell :td
            [env]
@@ -44,18 +48,12 @@
 
 (defstyled news-user-cell :td
            [env]
-           {:font-size     10
-            :color         "grey"
-            :border-bottom "1px solid #ddd"
-            :text-align    "right"})
+           user-cell-properties)
 
 (defstyled news-timestamp-cell :td
            [env]
-           {:font-size     10
-            :color         "grey"
-            :border-bottom "1px solid #ddd"
-            :text-align    "right"
-            :width         130})
+           (assoc user-cell-properties
+             :width 130))
 
 ; ---------- news poster ----------
 (defstyled news-form :div
