@@ -35,8 +35,10 @@ Or, if you don't want/need a background service you can just run:
 By default, redis will run on `redis://localhost:6379/`
 
 #### App
+Compile to JS files first with: `lein cljsbuild once`
+
 To start a web server for the application (port 8080), simply run the main
-fn in api.secure (lein run)
+fn in api.secure: `lein run`
 
 ## TODO
 
