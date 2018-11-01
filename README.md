@@ -36,7 +36,7 @@ By default, redis will run on `redis://localhost:6379/`
 
 #### App
 To start a web server for the application (port 8080), simply run the main
-fn in api.secure
+fn in api.secure (lein run)
 
 ## TODO
 
