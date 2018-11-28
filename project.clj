@@ -2,10 +2,10 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
-  :cljsbuild {:builds [{:source-paths ["src/cljs"]
+  :cljsbuild {:builds [{:source-paths ["client/cljs"]
                         :compiler     {:optimizations :whitespace
-                                       :output-to     "resources/public/js/main.js"
-                                       :output-dir    "resources/public/js"}}]}
+                                       :output-to     "server/priv/static/js/main.js"
+                                       :output-dir    "server/priv/static/js"}}]}
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.238"]                 

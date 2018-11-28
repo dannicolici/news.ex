@@ -1,0 +1,5 @@
+<div id="root"></div>
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript">
+    <%= @item %>.start()
+</script>
