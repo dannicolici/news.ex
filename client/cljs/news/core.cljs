@@ -18,10 +18,17 @@
                                 pagination-panel
                                 page-link
                                 page-link-inactive
-                                empty-panel]]))
+                                empty-panel]]
+            [cljsjs.phoenix]))
 
 (defn console [& args]
   (.log js/console (str args)))
+
+(def socket (ws/connect! (str
+                          "ws://" (-> js/location .-host) "/news")))
+(ws/join-with-handlers! "news:all" socket
+                        (fn [ok-resp] (console ok-resp))
+                        (fn [err-reason] (console "error: " err-reason)))
 
 (defn error-handler [{:keys [status status-text]}]
   (console "something went wrong: " status " " status-text))
