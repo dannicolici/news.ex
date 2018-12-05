@@ -1,7 +1,6 @@
 (ns news.core
-  (:require [ajax.core :refer [GET POST]]
+  (:require [ajax.core :refer [POST]]
             [reagent.core :as r]
-            [cognitect.transit :as t]
             [clojure.core.async :refer [go <! timeout]]
             [news.style :refer [news-table
                                 news-table-body
@@ -19,21 +18,14 @@
                                 page-link
                                 page-link-inactive
                                 empty-panel]]
-            [cljsjs.phoenix]))
+            [news.websocket :as ws]))
 
 (defn console [& args]
   (.log js/console (str args)))
 
 (def socket (ws/connect! (str
                           "ws://" (-> js/location .-host) "/news")))
-(ws/join-with-handlers! "news:all" socket
-                        (fn [ok-resp] (console ok-resp))
-                        (fn [err-reason] (console "error: " err-reason)))
 
-(defn error-handler [{:keys [status status-text]}]
-  (console "something went wrong: " status " " status-text))
-
-(def as-json (t/reader :json))
 (def page-size 4)
 
 (def news-list (r/atom {}))
@@ -43,24 +35,16 @@
 (def sort-criteria (r/atom :date-time))
 
 (defn response-handler [r]
-  (let [server-json (t/read as-json r)
+  (let [server-json (js->clj r)
         pages (get server-json "pages")
         news (get server-json "news")]
     (reset! news-list news)
     (reset! total-pages pages)))
 
-(defn get-paginated-news []
-  (GET "/api/news"
-       {:handler       response-handler
-        :error-handler error-handler
-        :params {:sort-by @sort-criteria
-                 :page-size page-size
-                 :page @current-page}}))
-
-(defn refresh-news []
-  (go
-    (<! (timeout 500))
-    (get-paginated-news)))
+(defn ws-connect []
+  (ws/join-with-handlers! "news:all" socket
+                          (fn [ok-resp] (response-handler ok-resp))
+                          (fn [err-reason] (console err-reason))))
 
 (defn post-news [news]
   (POST "/api/news" {:format :raw
@@ -68,21 +52,21 @@
 
 (defn sort-news [field]
   (reset! sort-criteria field)
-  (reset! current-page 1)
-  (get-paginated-news))
+  (reset! current-page 1))
+;TODO most probably push criteria to ws and get sorted news in response
 
 (defn news-reader []
   (news-table
     (news-table-body
       (simple-row {:key "news-header"}
         (simple-header-cell "")
-        (sorting-header-cell {:onClick #(sort-news :user-id)} "written by")
-        (sorting-header-cell {:onClick #(sort-news :date-time)} "on date"))
+        (sorting-header-cell {:onClick #(sort-news :user_id)} "written by")
+        (sorting-header-cell {:onClick #(sort-news :date_time)} "on date"))
       (for [news @news-list]
         (news-row {:key (get news "id")}
                   (news-text-cell (get news "text"))
-                  (news-user-cell (get news "user-id"))
-                  (news-timestamp-cell (get news "date-time")))))))
+                  (news-user-cell (get news "user_id"))
+                  (news-timestamp-cell (get news "date_time")))))))
 
 (defn news-poster []
   (news-form
@@ -92,8 +76,8 @@
                        :value   "Post"
                        :onClick #(do
                                    (post-news @current-post)
-                                   (reset! current-page 1)
-                                   (refresh-news))})))
+                                   (reset! current-page 1))})))
+                                  
 
 (defn page-element [page-no]
   (let [p (inc page-no)]
@@ -102,7 +86,7 @@
       (page-link {:key p
                   :onClick #(do
                               (reset! current-page p)
-                              (get-paginated-news))}
+                             )}; TODO and push criteria to ws
                  p))))
 
 (defn page-links []
@@ -124,6 +108,7 @@
 
 
 (defn ^:export start []
-  (get-paginated-news)
+  ; (get-paginated-news)
+  (ws-connect)
   (r/render-component [news-app]
                       (.getElementById js/document "root")))
