@@ -15,7 +15,7 @@ jobs:
     working_directory: ~/news.ex/server
     steps:
       - checkout:
-        path: ~/news.ex
+          path: ~/news.ex
       # specify any bash command here prefixed with `run: `
       - run: mix deps.get
       - run: mix ecto.create
