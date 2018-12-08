@@ -5,12 +5,12 @@ defmodule ServerWeb.NewsChannel do
 
   def join("news:all", _message, socket) do
     fake_news = %{
-      news: %News{
+      news: %{
         pages: 1,
-        news: [%Data{id: "1", user_id: "1", text: "awsome", date_time: "2018-12-05 10:00"}]
+        news: [%{id: "1", user_id: "1", text: "awsome", date_time: "2018-12-05 10:00"}]
       }
     }
-    
+
     response =
       ServerWeb.NewsView.render(
         "news.json",
@@ -24,7 +24,7 @@ defmodule ServerWeb.NewsChannel do
   #   {:error, %{reason: "unauthorized"}}
   # end
 
-  def handle_in("new_post", %{"body" => body}, socket) do
+  def handle_in("create", %{"text" => body}, socket) do
     broadcast!(socket, "new_post", %{body: body})
     {:noreply, socket}
   end

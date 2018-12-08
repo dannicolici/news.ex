@@ -108,7 +108,6 @@
 
 
 (defn ^:export start []
-  ; (get-paginated-news)
   (ws-connect)
   (r/render-component [news-app]
                       (.getElementById js/document "root")))
