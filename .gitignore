@@ -11,3 +11,4 @@ pom.xml.asc
 /resources/public/js
 *.iml
 /.idea
+.vscode/settings.json
