@@ -26,6 +26,6 @@ defmodule ServerWeb.NewsChannelTest do
   test "create broadcasts new post", %{socket: socket} do
     # TODO add real data, this is just to verify the broadcast
     push(socket, "create", %{"text" => "create test news"})
-    assert_broadcast("new_post", %{:body => "create test news"})
+    assert_broadcast("new_post", %{:body => "create test news", :custom => "default_search_criteria"})
   end
 end

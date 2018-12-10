@@ -1,5 +1,6 @@
 defmodule ServerWeb.NewsChannel do
   use Phoenix.Channel
+  use Phoenix.Socket
   alias Server.Api.News
   alias Server.Api.Data
 
@@ -17,7 +18,7 @@ defmodule ServerWeb.NewsChannel do
         fake_news
       )
 
-    {:ok, response, socket}
+    {:ok, response, assign(socket, :custom, "default_search_criteria")}
   end
 
   # def join("room:" <> _private_room_id, _params, _socket) do
@@ -25,7 +26,7 @@ defmodule ServerWeb.NewsChannel do
   # end
 
   def handle_in("create", %{"text" => body}, socket) do
-    broadcast!(socket, "new_post", %{body: body})
+    broadcast!(socket, "new_post", %{body: body, custom: socket.assigns.custom})
     {:noreply, socket}
   end
 end
