@@ -4,29 +4,27 @@ defmodule ServerWeb.NewsChannel do
   alias Server.Api.News
   alias Server.Api.Data
 
-  def join("news:all", _message, socket) do
-    fake_news = %{
+  def news_from_source(criteria) do
+    news_from_source = %{
       news: %{
         pages: 1,
-        news: [%{id: "1", user_id: "1", text: "awsome", date_time: "2018-12-05 10:00"}]
+        news: [%{id: "1", user_id: "1", text: criteria, date_time: "2018-12-05 10:00"}]
       }
     }
 
-    response =
-      ServerWeb.NewsView.render(
-        "news.json",
-        fake_news
-      )
-
-    {:ok, response, assign(socket, :custom, "default_search_criteria")}
+    ServerWeb.NewsView.render("news.json", news_from_source)
   end
 
-  # def join("room:" <> _private_room_id, _params, _socket) do
-  #   {:error, %{reason: "unauthorized"}}
-  # end
+  def join("news:all", _message, socket) do
+    {:ok, news_from_source("default"), socket}
+  end
 
   def handle_in("create", %{"text" => body}, socket) do
-    broadcast!(socket, "new_post", %{body: body, custom: socket.assigns.custom})
+    broadcast!(socket, "new_post", %{body: body})
     {:noreply, socket}
+  end
+
+  def handle_in("sort", %{"sort_by" => criteria}, socket) do
+    {:reply, {:ok, news_from_source(criteria)}, socket}
   end
 end

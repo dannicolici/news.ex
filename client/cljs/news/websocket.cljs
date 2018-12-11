@@ -17,3 +17,9 @@
         (.receive "ok" ok-handler)
         (.receive "error" err-handler))
     chan))
+
+(defn push-with-handlers! [chan msg_type payload ok-handler err-handler]
+    (-> chan
+       (.push msg_type payload)
+       (.receive "ok" ok-handler)
+       (.receive "error" err-handler)))

@@ -26,6 +26,8 @@
 (def socket (ws/connect! (str
                           "ws://" (-> js/location .-host) "/news")))
 
+(def news-channel (r/atom nil))
+
 (def page-size 4)
 
 (def news-list (r/atom {}))
@@ -52,8 +54,10 @@
 
 (defn sort-news [field]
   (reset! sort-criteria field)
-  (reset! current-page 1))
-;TODO most probably push criteria to ws and get sorted news in response
+  (reset! current-page 1)
+  (ws/push-with-handlers! @news-channel "sort" (clj->js {:sort_by field})
+                       (fn [ok-resp] (response-handler ok-resp))
+                       (fn [err-reason] (console err-reason))))
 
 (defn news-reader []
   (news-table
@@ -108,6 +112,6 @@
 
 
 (defn ^:export start []
-  (ws-connect)
+  (reset! news-channel (ws-connect))
   (r/render-component [news-app]
                       (.getElementById js/document "root")))

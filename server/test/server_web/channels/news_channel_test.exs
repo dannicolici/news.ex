@@ -15,7 +15,7 @@ defmodule ServerWeb.NewsChannelTest do
     # TODO add real data, this is just to verify the join reply
     expected = %{
       pages: 1,
-      news: [%{id: "1", user_id: "1", text: "awsome", date_time: "2018-12-05 10:00"}]
+      news: [%{id: "1", user_id: "1", text: "default", date_time: "2018-12-05 10:00"}]
     }
 
     {:ok, reply, _} = join(socket, NewsChannel, "news:all", %{})
@@ -24,8 +24,22 @@ defmodule ServerWeb.NewsChannelTest do
   end
 
   test "create broadcasts new post", %{socket: socket} do
-    # TODO add real data, this is just to verify the broadcast
     push(socket, "create", %{"text" => "create test news"})
-    assert_broadcast("new_post", %{:body => "create test news", :custom => "default_search_criteria"})
+
+    assert_broadcast("new_post", %{:body => "create test news"})
+  end
+
+  test "sort replies with all news sorted", %{socket: socket} do
+    # TODO add real data, this is just to verify that the sort message works
+    expected = %{
+      pages: 1,
+      news: [
+        %{id: "1", user_id: "1", text: "fancy sorting criteria", date_time: "2018-12-05 10:00"}
+      ]
+    }
+
+    ref = push(socket, "sort", %{"sort_by" => "fancy sorting criteria"})
+
+    assert_reply(ref, :ok, expected)
   end
 end
