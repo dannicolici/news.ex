@@ -23,7 +23,7 @@ defmodule ServerWeb.NewsChannelTest do
     assert MapSet.subset?(MapSet.new(reply), MapSet.new(expected))
   end
 
-  test "create broadcasts new post", %{socket: socket} do
+  test "create broadcasts new post message", %{socket: socket} do
     push(socket, "create", %{"text" => "create test news"})
 
     assert_broadcast("new_post", %{:body => "create test news"})
@@ -40,6 +40,6 @@ defmodule ServerWeb.NewsChannelTest do
 
     ref = push(socket, "sort", %{"sort_by" => "fancy sorting criteria"})
 
-    assert_reply(ref, :ok, expected)
+    assert_reply(ref, :ok, ^expected)
   end
 end
