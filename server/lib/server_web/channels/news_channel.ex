@@ -20,7 +20,10 @@ defmodule ServerWeb.NewsChannel do
   end
 
   def handle_in("create", %{"text" => body}, socket) do
+    :ets.insert(:news_table, {socket.assigns.user_id, body})
+
     broadcast!(socket, "new_post", %{body: body})
+
     {:noreply, socket}
   end
 

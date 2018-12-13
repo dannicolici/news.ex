@@ -4,9 +4,8 @@ defmodule ServerWeb.NewsChannelTest do
   use ServerWeb.ChannelCase
 
   setup do
-    {:ok, _, socket} =
-      socket(UserSocket, "user_id", %{some: :assign})
-      |> subscribe_and_join(NewsChannel, "news:all")
+    {:ok, socket} = connect(UserSocket, %{"user_id" => "test_user"}, %{})
+    {:ok, _, socket} = subscribe_and_join(socket, NewsChannel, "news:all")
 
     {:ok, socket: socket}
   end
@@ -18,7 +17,7 @@ defmodule ServerWeb.NewsChannelTest do
       news: [%{id: "1", user_id: "1", text: "default", date_time: "2018-12-05 10:00"}]
     }
 
-    {:ok, reply, _} = join(socket, NewsChannel, "news:all", %{})
+    {:ok, reply, _} = join(socket, NewsChannel, "news:all", %{:user_id => "test_user"})
 
     assert MapSet.subset?(MapSet.new(reply), MapSet.new(expected))
   end
@@ -26,7 +25,21 @@ defmodule ServerWeb.NewsChannelTest do
   test "create broadcasts new post message", %{socket: socket} do
     push(socket, "create", %{"text" => "create test news"})
 
+    :timer.sleep(500)
     assert_broadcast("new_post", %{:body => "create test news"})
+  end
+
+  test "create saves new post", %{socket: socket} do
+    :ets.delete(:news_table, "test_user")
+    push(socket, "create", %{"text" => "save news"})
+
+    :timer.sleep(500)
+    news = :ets.lookup(:news_table, "test_user")
+    assert news == [{"test_user", "save news"}]
+  end
+
+  test "TODO sync ETS access through Process (currently with sleep)", %{socket: socket} do
+    assert false
   end
 
   test "sort replies with all news sorted", %{socket: socket} do
