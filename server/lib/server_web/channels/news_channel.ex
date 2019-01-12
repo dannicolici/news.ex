@@ -3,6 +3,7 @@ defmodule ServerWeb.NewsChannel do
   use Phoenix.Socket
   alias Server.Api.News
   alias Server.Api.Data
+  alias Persistence.Db
 
   def news_from_source(criteria) do
     news_from_source = %{
@@ -20,7 +21,7 @@ defmodule ServerWeb.NewsChannel do
   end
 
   def handle_in("create", %{"text" => body}, socket) do
-    :ets.insert(:news_table, {socket.assigns.user_id, body})
+    GenServer.call(Db, {:insert_news, socket.assigns.user_id, body})
 
     broadcast!(socket, "new_post", %{body: body})
 

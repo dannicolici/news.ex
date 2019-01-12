@@ -2,6 +2,7 @@ defmodule ServerWeb.NewsChannelTest do
   alias ServerWeb.NewsChannel
   alias ServerWeb.UserSocket
   use ServerWeb.ChannelCase
+  alias Persistence.Db
 
   setup do
     {:ok, socket} = connect(UserSocket, %{"user_id" => "test_user"}, %{})
@@ -25,21 +26,16 @@ defmodule ServerWeb.NewsChannelTest do
   test "create broadcasts new post message", %{socket: socket} do
     push(socket, "create", %{"text" => "create test news"})
 
-    :timer.sleep(500)
     assert_broadcast("new_post", %{:body => "create test news"})
   end
 
   test "create saves new post", %{socket: socket} do
-    :ets.delete(:news_table, "test_user")
+    GenServer.call(Db, {:delete_news, "test_user"})
     push(socket, "create", %{"text" => "save news"})
+    assert_broadcast("new_post", %{:body => "save news"})
 
-    :timer.sleep(500)
-    news = :ets.lookup(:news_table, "test_user")
+    news = GenServer.call(Db, {:lookup_news, "test_user"})
     assert news == [{"test_user", "save news"}]
-  end
-
-  test "TODO sync ETS access through Process (currently with sleep)", %{socket: socket} do
-    assert false
   end
 
   test "sort replies with all news sorted", %{socket: socket} do

@@ -6,13 +6,16 @@ defmodule Server.Application do
   use Application
 
   def start(_type, _args) do
-    :ets.new(:news_table, [:bag, :named_table, :public])
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      ServerWeb.Endpoint
+      ServerWeb.Endpoint,
       # Starts a worker by calling: Server.Worker.start_link(arg)
       # {Server.Worker, arg},
+      %{
+        id: Persistence.Db,
+        start: {Persistence.Db, :start_link, [:ok]}
+      }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
