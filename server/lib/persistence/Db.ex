@@ -5,8 +5,6 @@ defmodule Persistence.Db do
     GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
-  ## Callbacks
-
   def init(_state) do
     table = :ets.new(:news_table, [:bag, :named_table, :public])
     {:ok, table}
