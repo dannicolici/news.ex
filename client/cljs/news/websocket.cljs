@@ -4,7 +4,7 @@
 (defn connect!  [address]
   ; don't hard code user_id, add it from login/register instead
   (let [socket (js/Phoenix.Socket. address
-                                   (clj->js {"params:" {"user_id:" "cljs_hardcoded"}}))]
+                                   (clj->js {:params {:user_id "cljs_hardcoded"}}))]
     (.connect socket)
     socket))
 

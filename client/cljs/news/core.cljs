@@ -36,7 +36,7 @@
 (def total-pages (r/atom 0))
 (def sort-criteria (r/atom :date-time))
 
-(defn response-handler [r]
+(defn latest-news-handler [r]
   (let [server-json (js->clj r)
         pages (get server-json "pages")
         news (get server-json "news")]
@@ -45,18 +45,19 @@
 
 (defn ws-connect []
   (ws/join-with-handlers! "news:all" socket
-                          (fn [ok-resp] (response-handler ok-resp))
+                          (fn [ok-resp] (latest-news-handler ok-resp))
                           (fn [err-reason] (console err-reason))))
 
 (defn post-news [news]
-  (POST "/api/news" {:format :raw
-                     :params {:text news}}))
+  (ws/push-with-handlers! @news-channel "create" (clj->js {:text news})
+                          (fn [ok-resp] (latest-news-handler ok-resp))
+                          (fn [err-reason] (console err-reason))))
 
 (defn sort-news [field]
   (reset! sort-criteria field)
   (reset! current-page 1)
   (ws/push-with-handlers! @news-channel "sort" (clj->js {:sort_by field})
-                       (fn [ok-resp] (response-handler ok-resp))
+                       (fn [ok-resp] (latest-news-handler ok-resp))
                        (fn [err-reason] (console err-reason))))
 
 (defn news-reader []

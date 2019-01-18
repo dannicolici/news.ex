@@ -5,6 +5,7 @@ defmodule ServerWeb.NewsChannelTest do
   alias Persistence.Db
 
   setup do
+    GenServer.call(Db, {:delete_news, "test_user"})
     {:ok, socket} = connect(UserSocket, %{"user_id" => "test_user"}, %{})
     {:ok, _, socket} = subscribe_and_join(socket, NewsChannel, "news:all")
 
@@ -30,12 +31,11 @@ defmodule ServerWeb.NewsChannelTest do
   end
 
   test "create saves new post", %{socket: socket} do
-    GenServer.call(Db, {:delete_news, "test_user"})
     push(socket, "create", %{"text" => "save news"})
     assert_broadcast("new_post", %{:body => "save news"})
 
     news = GenServer.call(Db, {:lookup_news, "test_user"})
-    assert news == [{"test_user", "save news"}]
+    assert [{"test_user", %{text: "save news", user_id: "test_user"}}] = news
   end
 
   test "sort replies with all news sorted", %{socket: socket} do
@@ -43,7 +43,7 @@ defmodule ServerWeb.NewsChannelTest do
     expected = %{
       pages: 1,
       news: [
-        %{id: "1", user_id: "1", text: "fancy sorting criteria", date_time: "2018-12-05 10:00"}
+        %{id: "1", user_id: "1", text: "default", date_time: "2018-12-05 10:00"}
       ]
     }
 

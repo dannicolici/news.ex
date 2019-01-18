@@ -11,7 +11,6 @@ defmodule ServerWeb.NewsView do
   end
 
   def render("news.json", %{news: news}) do
-    %{pages: news.pages,
-      news: news.news}
+    %{pages: news.pages, news: news.news}
   end
 end

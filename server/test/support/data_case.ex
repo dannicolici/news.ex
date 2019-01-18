@@ -1,6 +1,4 @@
 defmodule Server.DataCase do
-
-
   use ExUnit.CaseTemplate
 
   using do

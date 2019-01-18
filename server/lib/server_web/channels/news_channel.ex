@@ -1,34 +1,31 @@
 defmodule ServerWeb.NewsChannel do
   use Phoenix.Channel
   use Phoenix.Socket
-  alias Server.Api.News
-  alias Server.Api.Data
-  alias Persistence.Db
+  alias Server.Api.News.Service
 
-  def news_from_source(criteria) do
-    news_from_source = %{
+  def json(latest_news) do
+    response = %{
       news: %{
         pages: 1,
-        news: [%{id: "1", user_id: "1", text: criteria, date_time: "2018-12-05 10:00"}]
+        news: latest_news |> Enum.map(fn [_, n] -> n end)
       }
     }
 
-    ServerWeb.NewsView.render("news.json", news_from_source)
+    ServerWeb.NewsView.render("news.json", response)
   end
 
   def join("news:all", _message, socket) do
-    {:ok, news_from_source("default"), socket}
+    {:ok, json(Service.get_all_news()), socket}
   end
 
   def handle_in("create", %{"text" => body}, socket) do
-    GenServer.call(Db, {:insert_news, socket.assigns.user_id, body})
-
+    Service.insert_news(body, socket.assigns.user_id)
     broadcast!(socket, "new_post", %{body: body})
-
-    {:noreply, socket}
+    {:reply, {:ok, json(Service.get_all_news())}, socket}
   end
 
-  def handle_in("sort", %{"sort_by" => criteria}, socket) do
-    {:reply, {:ok, news_from_source(criteria)}, socket}
+  def handle_in("sort", %{"sort_by" => _criteria}, socket) do
+    # TODO: real sorting using criteria
+    {:reply, {:ok, json(Service.get_all_news())}, socket}
   end
 end
