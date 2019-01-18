@@ -10,7 +10,7 @@ defmodule Persistence.Db do
     # insert 1 dummy row to have some data to display on join
     :ets.insert(
       :news_table,
-      {"1", %{id: "1", user_id: "1", text: "default", date_time: "2018-12-05 10:00"}}
+      {"1", %{id: "1", user_id: "x_dummy", text: "default", date_time: "2018-12-05 10:00"}}
     )
 
     {:ok, table}

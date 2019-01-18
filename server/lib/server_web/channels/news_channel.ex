@@ -15,17 +15,20 @@ defmodule ServerWeb.NewsChannel do
   end
 
   def join("news:all", _message, socket) do
-    {:ok, json(Service.get_all_news()), socket}
+    {:ok, json(Service.get_all()), socket}
   end
 
   def handle_in("create", %{"text" => body}, socket) do
     Service.insert_news(body, socket.assigns.user_id)
     broadcast!(socket, "new_post", %{body: body})
-    {:reply, {:ok, json(Service.get_all_news())}, socket}
+    {:reply, {:ok, json(Service.get_all())}, socket}
   end
 
-  def handle_in("sort", %{"sort_by" => _criteria}, socket) do
-    # TODO: real sorting using criteria
-    {:reply, {:ok, json(Service.get_all_news())}, socket}
+  def handle_in("sort", %{"sort_by" => criteria}, socket) do
+    sorted_news = Service.get_all() 
+                 |> Enum.sort_by fn [_, n] ->
+                                    Map.fetch(n, String.to_existing_atom(criteria))
+                                 end
+    {:reply, {:ok, json(sorted_news)}, socket}
   end
 end

@@ -1,8 +1,16 @@
 defmodule Server.Api.News.Service do
   alias Persistence.Db
 
-  def get_all_news() do
+  def get_all() do
     GenServer.call(Db, :all_news)
+  end
+
+  def delete(key) do      
+    GenServer.call(Db, {:delete_news, key})
+  end
+
+  def find(key) do
+    GenServer.call(Db, {:lookup_news, key})
   end
 
   def insert_news(body, user) do
