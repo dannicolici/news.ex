@@ -1,8 +1,16 @@
 defmodule Server.Api.News.Service do
   alias Persistence.Db
 
-  def get_all() do
+  def get_all(criteria \\ "date_time") do
     GenServer.call(Db, :all_news)
+    |> sort_by(criteria)
+  end
+
+  defp sort_by(news, criteria) do
+    news
+    |> Enum.sort_by(fn [_, n] ->
+                       Map.fetch(n, String.to_existing_atom(criteria))
+                    end)
   end
 
   def delete(key) do      

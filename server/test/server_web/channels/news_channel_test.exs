@@ -10,6 +10,9 @@ defmodule ServerWeb.NewsChannelTest do
     Service.delete("user1")
     Service.delete("user2")
     Service.delete("user3")
+    Service.delete("user4")
+    Service.delete("user5")
+    Service.delete("user6")
     Service.delete("1")
 
     {:ok, socket} = connect(UserSocket, %{"user_id" => "test_user"}, %{})
@@ -51,6 +54,29 @@ defmodule ServerWeb.NewsChannelTest do
                                     %{date_time: "2019-01-01 10:00", id: _, text: "test news", user_id: "user2"},
                                     %{date_time: "2019-01-01 10:00", id: _, text: "test news", user_id: "user3"}],
                                 pages: 1})
+  end
+
+  test "all news come in pages", %{socket: socket} do    
+    insert_news_with("user1", "2019-01-01 10:00")
+    insert_news_with("user2", "2019-01-01 10:01")
+    insert_news_with("user3", "2019-01-01 10:02")
+    insert_news_with("user4", "2019-01-01 10:03")
+    insert_news_with("user5", "2019-01-01 10:04")
+    insert_news_with("user6", "2019-01-01 10:05")   
+
+    ref = push(socket, "get-page", %{"page" => 1})
+
+    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:00", id: _, text: "test news", user_id: "user1"},
+                                    %{date_time: "2019-01-01 10:01", id: _, text: "test news", user_id: "user2"},
+                                    %{date_time: "2019-01-01 10:02", id: _, text: "test news", user_id: "user3"},
+                                    %{date_time: "2019-01-01 10:03", id: _, text: "test news", user_id: "user4"}],
+                                pages: 2})
+
+    ref = push(socket, "get-page", %{"page" => 2})
+
+    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:04", id: _, text: "test news", user_id: "user5"},
+                                    %{date_time: "2019-01-01 10:05", id: _, text: "test news", user_id: "user6"}],
+                                pages: 2})
   end
 
   defp insert_news_with(user, date_string) do

@@ -48,17 +48,17 @@
                           (fn [ok-resp] (latest-news-handler ok-resp))
                           (fn [err-reason] (console err-reason))))
 
-(defn post-news [news]
-  (ws/push-with-handlers! @news-channel "create" (clj->js {:text news})
-                          (fn [ok-resp] (latest-news-handler ok-resp))
-                          (fn [err-reason] (console err-reason))))
+(defn- send-message [message params]
+  (ws/push-with-handlers! @news-channel message (clj->js params)
+                       (fn [ok-resp] (latest-news-handler ok-resp))
+                       (fn [err-reason] (console err-reason))))
+
+(defn post-news [news] (send-message "create" {:text news}))
 
 (defn sort-news [field]
   (reset! sort-criteria field)
   (reset! current-page 1)
-  (ws/push-with-handlers! @news-channel "sort" (clj->js {:sort_by field})
-                       (fn [ok-resp] (latest-news-handler ok-resp))
-                       (fn [err-reason] (console err-reason))))
+  (send-message "sort" {:sort_by field}))
 
 (defn news-reader []
   (news-table
@@ -91,7 +91,8 @@
       (page-link {:key p
                   :onClick #(do
                               (reset! current-page p)
-                             )}; TODO and push criteria to ws
+                              (send-message "get-page" {:page @current-page})
+                            )}
                  p))))
 
 (defn page-links []

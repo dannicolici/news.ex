@@ -7,12 +7,6 @@ defmodule Persistence.Db do
 
   def init(_state) do
     table = :ets.new(:news_table, [:bag, :named_table, :public])
-    # insert 1 dummy row to have some data to display on join
-    :ets.insert(
-      :news_table,
-      {"1", %{id: "1", user_id: "x_dummy", text: "default", date_time: "2018-12-05 10:00"}}
-    )
-
     {:ok, table}
   end
 
