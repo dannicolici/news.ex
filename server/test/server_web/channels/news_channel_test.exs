@@ -5,15 +5,11 @@ defmodule ServerWeb.NewsChannelTest do
   alias Persistence.Db
   alias Server.Api.News.Service
 
+  @test_news "test news"
+
   setup do
-    Service.delete("test_user")
-    Service.delete("user1")
-    Service.delete("user2")
-    Service.delete("user3")
-    Service.delete("user4")
-    Service.delete("user5")
-    Service.delete("user6")
-    Service.delete("1")
+    ["test_user","user1","user2","user3","user4","user5","user6","1"]
+    |> Enum.map &Service.delete/1
 
     {:ok, socket} = connect(UserSocket, %{"user_id" => "test_user"}, %{})
     {:ok, _, socket} = subscribe_and_join(socket, NewsChannel, "news:all")
@@ -26,7 +22,7 @@ defmodule ServerWeb.NewsChannelTest do
 
     {:ok, reply, _} = join(socket, NewsChannel, "news:all", %{:user_id => "test_user"})
 
-    assert %{news: [%{text: "test news", user_id: "user1"}]} = reply
+    assert %{news: [%{text: @test_news, user_id: "user1"}]} = reply
   end
 
   test "create broadcasts new post message", %{socket: socket} do
@@ -50,9 +46,9 @@ defmodule ServerWeb.NewsChannelTest do
 
     ref = push(socket, "sort", %{"sort_by" => "user_id"})
 
-    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:00", id: _, text: "test news", user_id: "user1"},
-                                    %{date_time: "2019-01-01 10:00", id: _, text: "test news", user_id: "user2"},
-                                    %{date_time: "2019-01-01 10:00", id: _, text: "test news", user_id: "user3"}],
+    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:00", id: _, text: @test_news, user_id: "user1"},
+                                    %{date_time: "2019-01-01 10:00", id: _, text: @test_news, user_id: "user2"},
+                                    %{date_time: "2019-01-01 10:00", id: _, text: @test_news, user_id: "user3"}],
                                 pages: 1})
   end
 
@@ -66,16 +62,16 @@ defmodule ServerWeb.NewsChannelTest do
 
     ref = push(socket, "get-page", %{"page" => 1})
 
-    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:00", id: _, text: "test news", user_id: "user1"},
-                                    %{date_time: "2019-01-01 10:01", id: _, text: "test news", user_id: "user2"},
-                                    %{date_time: "2019-01-01 10:02", id: _, text: "test news", user_id: "user3"},
-                                    %{date_time: "2019-01-01 10:03", id: _, text: "test news", user_id: "user4"}],
+    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:00", id: _, text: @test_news, user_id: "user1"},
+                                    %{date_time: "2019-01-01 10:01", id: _, text: @test_news, user_id: "user2"},
+                                    %{date_time: "2019-01-01 10:02", id: _, text: @test_news, user_id: "user3"},
+                                    %{date_time: "2019-01-01 10:03", id: _, text: @test_news, user_id: "user4"}],
                                 pages: 2})
 
     ref = push(socket, "get-page", %{"page" => 2})
 
-    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:04", id: _, text: "test news", user_id: "user5"},
-                                    %{date_time: "2019-01-01 10:05", id: _, text: "test news", user_id: "user6"}],
+    assert_reply(ref, :ok, %{news: [%{date_time: "2019-01-01 10:04", id: _, text: @test_news, user_id: "user5"},
+                                    %{date_time: "2019-01-01 10:05", id: _, text: @test_news, user_id: "user6"}],
                                 pages: 2})
   end
 
@@ -86,7 +82,7 @@ defmodule ServerWeb.NewsChannelTest do
        %{
          id: "#{System.unique_integer([:monotonic, :positive])}",
          user_id: user,
-         text: "test news",
+         text: @test_news,
          date_time: date_string
        }}
     )
