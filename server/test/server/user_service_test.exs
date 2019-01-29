@@ -8,9 +8,9 @@ defmodule Server.Api.UserServiceTest do
                 pass <- binary() do
                     Service.insert(user, pass)
                     [{u, hashed_pass}] = Service.get(user)
-                    
+
                     assert u == user
-                    assert hashed_pass == pass
+                    assert Pbkdf2.verify_pass(pass, hashed_pass) == true
                 end
     end
 end

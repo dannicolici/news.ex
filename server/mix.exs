@@ -39,7 +39,8 @@ defmodule Server.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.1"},
       {:plug_cowboy, "~> 2.0"},
-      {:stream_data, "~> 0.1", only: :test}
+      {:stream_data, "~> 0.1", only: :test},
+      {:pbkdf2_elixir, "~> 0.12"}
     ]
   end
 end
