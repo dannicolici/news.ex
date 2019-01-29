@@ -1,5 +1,6 @@
 (ns menu.register
   (:require [reagent.core :as r]
+            [reagent.cookies :as cookies]
             [ajax.core :refer [GET POST]]))
 
 (def registerSuccess (r/atom false))
@@ -7,9 +8,10 @@
 (defn register [id fname lname pwd]
   (POST "/api/user" {:format :raw
                      :params {:id id :fname fname :lname lname :pwd pwd}
-                     :handler (fn [r] (do
-                                        (println r)
-                                        (reset! registerSuccess true)))}))
+                     :handler (fn [r] (let [json (js->clj r)]
+                                        (cookies/set! :news_cookie (get json "token"))
+                                        (reset! registerSuccess (contains? json "token"))))}))
+
 (defn elem [id]
   (.getElementById js/document id))
 

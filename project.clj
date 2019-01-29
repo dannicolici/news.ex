@@ -15,7 +15,8 @@
                  [reagent "0.8.1"]
                  [clojure.java-time "0.3.2"]
                  [thheller/shadow-client "1.3.2"]
-                 [cljsjs/phoenix "1.3.0-0"]]
+                 [cljsjs/phoenix "1.3.0-0"]
+                 [reagent-utils "0.3.2"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
 )

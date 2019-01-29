@@ -22,6 +22,12 @@ defmodule ServerWeb.Router do
     get "/news", PageController, :news
   end
 
+  scope "/api", ServerWeb do
+    pipe_through :api
+
+    post "/user", PageController, :user
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", ServerWeb do
   #   pipe_through :api

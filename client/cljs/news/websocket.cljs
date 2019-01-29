@@ -2,7 +2,7 @@
   (:require [cljsjs.phoenix]))
 
 (defn connect!  [address]
-  ; don't hard code user_id, add it from login/register instead
+  ; don't hard code user_id, add it from login/register instead (use Phoenix.Token instead of user_id)
   (let [socket (js/Phoenix.Socket. address
                                    (clj->js {:params {:user_id "cljs_hardcoded"}}))]
     (.connect socket)
