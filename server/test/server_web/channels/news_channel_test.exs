@@ -9,7 +9,7 @@ defmodule ServerWeb.NewsChannelTest do
 
   setup do
     ["test_user","user1","user2","user3","user4","user5","user6","1"]
-    |> Enum.map &Service.delete/1
+    |> Enum.map(&Service.delete/1)
 
     {:ok, socket} = connect(UserSocket, %{"user_id" => "test_user"}, %{})
     {:ok, _, socket} = subscribe_and_join(socket, NewsChannel, "news:all")

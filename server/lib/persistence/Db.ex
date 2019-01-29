@@ -6,8 +6,9 @@ defmodule Persistence.Db do
   end
 
   def init(_state) do
-    table = :ets.new(:news_table, [:bag, :named_table, :public])
-    {:ok, table}
+    news_table = :ets.new(:news_table, [:bag, :named_table, :public])
+    user_table = :ets.new(:user_table, [:set, :named_table, :public])
+    {:ok, {news_table, user_table}}
   end
 
   def handle_call({:delete_news, key}, _from, state) do
@@ -26,5 +27,14 @@ defmodule Persistence.Db do
   def handle_call({:insert_news, key, value}, _from, state) do
     :ets.insert(:news_table, {key, value})
     {:reply, :ok, state}
+  end
+
+  def handle_call({:insert_user, key, value}, _from, state) do
+    :ets.insert(:user_table, {key, value})
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:lookup_user, key}, _from, state) do
+    {:reply, :ets.lookup(:user_table, key), state}
   end
 end
