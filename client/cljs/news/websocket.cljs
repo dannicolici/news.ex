@@ -1,10 +1,10 @@
 (ns news.websocket
-  (:require [cljsjs.phoenix]))
+  (:require [cljsjs.phoenix]
+            [reagent.cookies :as cookies]))
 
 (defn connect!  [address]
-  ; don't hard code user_id, add it from login/register instead (use Phoenix.Token instead of user_id)
   (let [socket (js/Phoenix.Socket. address
-                                   (clj->js {:params {:user_id "cljs_hardcoded"}}))]
+                                   (clj->js {:params {:token (cookies/get :news_cookie)}}))]
     (.connect socket)
     socket))
 

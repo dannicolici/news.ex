@@ -1,5 +1,6 @@
 defmodule ServerWeb.UserSocket do
   use Phoenix.Socket
+  alias Server.Api.User.Service
 
   ## Channels
   channel "news:*", ServerWeb.NewsChannel
@@ -16,8 +17,13 @@ defmodule ServerWeb.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(params, socket, _connect_info) do
-    # todo auth user_id from params
-    {:ok, assign(socket, :user_id, params["user_id"])}
+    case Phoenix.Token.verify(socket, "user salt", params["token"], max_age: 86400) do
+      {:ok, user_id} ->
+        socket = assign(socket, :user_id, user_id)
+        {:ok, socket}
+      {:error, _} ->
+        :error
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

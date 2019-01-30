@@ -25,7 +25,7 @@ defmodule ServerWeb.PageController do
       [] ->
         UserService.insert(id, pwd)
         [{user_id, pass}] = UserService.get(id)
-        json(conn, %{token: Phoenix.Token.sign(conn, "user salt", user_id), user: user_id})
+        json(conn, %{token: Phoenix.Token.sign(conn, "user salt", user_id)})
       end
   end
 end
