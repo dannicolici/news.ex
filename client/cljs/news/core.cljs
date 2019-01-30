@@ -23,7 +23,7 @@
 (defn console [& args]
   (.log js/console (str args)))
 
-(def socket (ws/connect! (str
+(defn socket [] (ws/connect! (str
                           "ws://" (-> js/location .-host) "/news")))
 
 (def news-channel (r/atom nil))
@@ -44,7 +44,7 @@
     (reset! total-pages pages)))
 
 (defn ws-connect []
-  (ws/join-with-handlers! "news:all" socket
+  (ws/join-with-handlers! "news:all" (socket)
                           (fn [ok-resp] (latest-news-handler ok-resp))
                           (fn [err-reason] (console err-reason))))
 
