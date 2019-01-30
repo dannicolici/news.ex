@@ -10,7 +10,7 @@ defmodule Server.Api.UserServiceTest do
                     [{u, hashed_pass}] = Service.get(user)
 
                     assert u == user
-                    assert Pbkdf2.verify_pass(pass, hashed_pass) == true
+                    assert Service.pass_matches_hash? pass, hashed_pass
                 end
     end
 end

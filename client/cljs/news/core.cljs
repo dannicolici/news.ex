@@ -1,6 +1,7 @@
 (ns news.core
   (:require [ajax.core :refer [POST]]
-            [reagent.core :as r]
+            [reagent.core :as r]  
+            [reagent.cookies :as cookies]
             [clojure.core.async :refer [go <! timeout]]
             [news.style :refer [news-table
                                 news-table-body
@@ -103,6 +104,10 @@
 (defn vertical-space []
   (empty-panel ""))
 
+(defn logout []
+  (cookies/remove! :news_cookie)
+  (set! (.-location js/document) "/login"))
+
 (defn news-app []
   [:div
    [news-poster]
@@ -110,10 +115,11 @@
    [news-reader]
    [page-links]
    [vertical-space]
-   [:form {:action "logout" :method "post"} [:button "Logout"]]])
+   [:button {:onClick #(logout)} "Logout"]])
 
 
 (defn ^:export start []
+  (if (nil? (cookies/get :news_cookie)) (logout))
   (reset! news-channel (ws-connect))
   (r/render-component [news-app]
                       (.getElementById js/document "root")))

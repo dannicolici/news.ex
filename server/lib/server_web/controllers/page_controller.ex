@@ -18,14 +18,29 @@ defmodule ServerWeb.PageController do
     render(conn, "index.html", item: "news.core", title: "News")
   end
 
-  def user(conn, %{"id" => id, "fname" => fname, "lname" => lname, "pwd" => pwd}) do
+  def register_user(conn, %{"id" => id, "fname" => fname, "lname" => lname, "pwd" => pwd}) do
     case UserService.get(id) do
       [{_user_id, _pass}] ->
         json(conn, %{error: "user exists"})
       [] ->
+        # some validation would be in order (not empty fields, etc)
         UserService.insert(id, pwd)
-        [{user_id, pass}] = UserService.get(id)
+        [{user_id, _pass}] = UserService.get(id)
         json(conn, %{token: Phoenix.Token.sign(conn, "user salt", user_id)})
+      end
+  end
+
+  def login_user(conn, %{"id" => id, "pwd" => pwd}) do
+    case UserService.get(id) do
+      [] ->
+        json(conn, %{error: "user does not exist"})
+      [{user_id, hashed_pass}] ->
+        case UserService.pass_matches_hash?(pwd, hashed_pass) do
+          true ->
+            json(conn, %{token: Phoenix.Token.sign(conn, "user salt", user_id)})
+          false ->
+            json(conn, %{error: "wrong password"})
+        end
       end
   end
 end

@@ -6,11 +6,11 @@
 (def registerSuccess (r/atom false))
 
 (defn register [id fname lname pwd]
-  (POST "/api/user" {:format :raw
-                     :params {:id id :fname fname :lname lname :pwd pwd}
-                     :handler (fn [r] (let [json (js->clj r)]
-                                        (cookies/set! :news_cookie (get json "token"))
-                                        (reset! registerSuccess (contains? json "token"))))}))
+  (POST "/api/user/register" {:format :raw
+                              :params {:id id :fname fname :lname lname :pwd pwd}
+                              :handler (fn [r] (let [json (js->clj r)]
+                                                 (cookies/set! :news_cookie (get json "token"))
+                                                 (reset! registerSuccess (contains? json "token"))))}))
 
 (defn elem [id]
   (.getElementById js/document id))
