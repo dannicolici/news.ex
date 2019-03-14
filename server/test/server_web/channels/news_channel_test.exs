@@ -46,7 +46,7 @@ defmodule ServerWeb.NewsChannelTest do
     clean(["user1"])
   end
 
-  test "create broadcasts and persists new post message" do
+  test "create broadcasts new post message" do
     socket = connect("test_user")
     push(socket, "create", %{"text" => "create test news"})
 
